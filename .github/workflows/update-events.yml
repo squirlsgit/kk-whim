@@ -1,0 +1,45 @@
+# Daily event refresh for Whim.
+# Place this file at: .github/workflows/update-events.yml in your repository.
+#
+# It runs every morning (13:00 UTC = 6am Pacific), refreshes events.json via
+# update-events.mjs, and commits the result — GitHub Pages then serves the new
+# data automatically, so the app updates itself with no manual work.
+#
+# Setup:
+#   1. Put update-events.mjs and events.json in the repo root (next to index.html)
+#   2. Optional but recommended: add a free Ticketmaster API key as a repo secret
+#      named TM_API_KEY (Settings → Secrets and variables → Actions)
+#   3. Settings → Actions → General → Workflow permissions → "Read and write permissions"
+
+name: Update events daily
+
+on:
+  schedule:
+    - cron: "0 13 * * *"   # 6am Pacific, every day
+  workflow_dispatch:        # also lets you run it manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Refresh events.json
+        env:
+          TM_API_KEY: ${{ secrets.TM_API_KEY }}
+        run: node update-events.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "whim-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add events.json
+          git diff --cached --quiet && echo "No changes today." || git commit -m "Daily event refresh $(date -u +%F)"
+          git push
