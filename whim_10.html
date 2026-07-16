@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0e14">
+<meta name="description" content="Whim — see what's happening around you tonight, this weekend, or within a 3-hour drive.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Whim">
+<link rel="manifest" href='data:application/manifest+json,{"name":"Whim","short_name":"Whim","start_url":".","display":"standalone","background_color":"%230b0e14","theme_color":"%230b0e14"}'>
+<title>Whim — your weekend, on a whim</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0e14; --surface:#141824; --raise:#1b2130; --glass:rgba(20,24,36,.82);
+    --text:#e8ebf2; --muted:#8a92a6; --line:rgba(255,255,255,.08);
+    --grad:linear-gradient(120deg,#8b5cf6 0%,#38bdf8 60%,#34d399 120%);
+    --accent:#8b5cf6; --accent-2:#38bdf8;
+    --free:#34d399; --gold:#fbbf24;
+    --r:18px;
+  }
+  body.light{
+    --bg:#f4f5f8; --surface:#ffffff; --raise:#ffffff; --glass:rgba(255,255,255,.86);
+    --text:#171a22; --muted:#6b7284; --line:#e5e7ee;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:"Plus Jakarta Sans","Avenir Next",system-ui,-apple-system,sans-serif;color:var(--text);background:var(--bg);overflow:hidden}
+  #app{display:grid;grid-template-columns:410px 1fr;grid-template-rows:auto auto 1fr;height:100vh;height:100dvh}
+  button{font-family:inherit}
+
+  /* ---------- header ---------- */
+  header{grid-column:1/-1;display:flex;align-items:center;gap:10px;background:var(--bg);padding:12px 18px 8px;z-index:1200}
+  .brand{display:flex;align-items:center;gap:8px;margin-right:8px;flex-shrink:0}
+  .brand svg{display:block}
+  .brand b{font-size:17px;font-weight:800;letter-spacing:-.02em}
+  .hscroll{display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:none;flex:1}
+  .hscroll::-webkit-scrollbar{display:none}
+  .chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:12.5px;font-weight:600;padding:7px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
+  .chip:hover{color:var(--text)}
+  .chip[aria-pressed="true"]{background:var(--grad);border-color:transparent;color:#fff}
+  .chip.free-chip[aria-pressed="true"]{background:var(--free);color:#06281c}
+  .icon-btn{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:15px;cursor:pointer;flex-shrink:0;display:grid;place-items:center}
+  .icon-btn:hover{border-color:var(--accent)}
+  .spin-btn{border:1px solid var(--line);background:var(--surface);color:var(--text);font-weight:700;font-size:13px;padding:8px 15px;border-radius:999px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;gap:6px}
+  .spin-btn:hover{border-color:var(--accent-2)}
+  .spin-btn .nd{display:inline-block;transition:transform .7s cubic-bezier(.2,.8,.3,1)}
+  .cta{border:none;background:var(--grad);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border-radius:999px;cursor:pointer;flex-shrink:0}
+  .cta:active{transform:scale(.97)}
+  button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+
+  .tseg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;flex-shrink:0}
+  .tseg button{border:none;background:none;color:var(--muted);font-size:12.5px;font-weight:700;padding:6px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .tseg button[aria-pressed="true"]{background:var(--grad);color:#fff}
+  .fbadge{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--grad);color:#fff;font-size:10px;font-weight:800;margin-left:6px}
+  .fsec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:16px 0 8px;display:flex;align-items:center;gap:6px}
+  .flink{border:none;background:none;color:var(--accent-2);font-size:11px;font-weight:700;cursor:pointer;text-transform:none;letter-spacing:0;padding:0}
+  .drive-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  .fopt{border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:9px 6px;cursor:pointer;text-align:center;color:var(--muted)}
+  .fopt b{display:block;font-size:13px;color:var(--text)}
+  .fopt span{font-size:10.5px}
+  .fopt[aria-pressed="true"]{border-color:transparent;background:var(--grad)}
+  .fopt[aria-pressed="true"] b,.fopt[aria-pressed="true"] span{color:#fff}
+  .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .cat-tile{display:flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 10px;cursor:pointer;color:var(--muted);font-size:12px;font-weight:700}
+  .cat-tile .ce{font-size:15px}
+  .cat-tile[aria-pressed="true"]{border-color:var(--accent);color:var(--text);background:rgba(139,92,246,.12)}
+  .ph-title{font-size:15px;font-weight:800;letter-spacing:-.015em;color:var(--text)}
+  .ph-sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .ph-sub b{color:var(--text)}
+
+  /* ---------- day strip ---------- */
+  .daystrip{grid-column:1/-1;display:flex;gap:5px;overflow-x:auto;background:var(--bg);padding:4px 18px 12px;z-index:1150;scrollbar-width:none}
+  .daystrip::-webkit-scrollbar{display:none}
+  .day{min-width:58px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--muted);cursor:pointer;padding:7px 6px 8px;text-align:center;flex-shrink:0}
+  .day small{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase}
+  .day b{font-size:15px;font-weight:800;display:block;line-height:1.3;color:var(--text)}
+  .day .dots{display:flex;justify-content:center;gap:2.5px;height:5px;margin-top:3px}
+  .day .dots i{width:4.5px;height:4.5px;border-radius:50%;display:inline-block}
+  .day.sel{background:var(--grad);border-color:transparent}
+  .day.sel small,.day.sel b{color:#fff}
+  .day.today b::after{content:"•";color:var(--gold);margin-left:2px}
+  .day.dim{opacity:.35}
+
+  /* ---------- panel ---------- */
+  aside{background:var(--bg);overflow-y:auto;z-index:1100;display:flex;flex-direction:column;padding:0 6px 0 12px}
+  .panel-head{padding:4px 6px 10px;position:sticky;top:0;background:var(--bg);z-index:5;display:flex;align-items:center;gap:8px}
+  .panel-head h2{font-size:13px;font-weight:700;color:var(--muted);flex:1}
+  .panel-head .count{color:var(--text);font-weight:800}
+  .sort{border:1px solid var(--line);border-radius:10px;font:inherit;font-size:12px;padding:5px 7px;color:var(--muted);background:var(--surface)}
+  .area-chip{border:none;background:var(--grad);color:#fff;font-size:11px;font-weight:700;padding:5px 11px;border-radius:999px;cursor:pointer}
+
+  /* ---------- editor's picks ---------- */
+  .rail-head{display:flex;align-items:baseline;gap:8px;padding:4px 6px 9px}
+  .rail-head b{font-size:14px;font-weight:800;letter-spacing:-.01em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .rail-head span{font-size:11px;color:var(--muted)}
+  .rail{display:flex;gap:10px;overflow-x:auto;padding:0 6px 14px;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .pick{min-width:140px;max-width:140px;border-radius:18px;overflow:hidden;cursor:pointer;background:var(--surface);flex-shrink:0;border:1px solid var(--line);transition:transform .12s}
+  .pick:hover{transform:translateY(-2px)}
+  .pick .thumb{height:76px;display:grid;place-items:center;font-size:30px;background:linear-gradient(135deg,var(--c1),var(--c2))}
+  .pick .pt{padding:9px 11px 11px}
+  .pick .pt b{display:block;font-size:12px;font-weight:700;line-height:1.3;letter-spacing:-.01em}
+  .pick .pt span{font-size:10.5px;color:var(--muted)}
+
+  /* ---------- cards ---------- */
+  .cards{padding:2px 6px 90px;display:flex;flex-direction:column;gap:8px}
+  .card{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;cursor:pointer;transition:transform .12s,border-color .15s}
+  .card:hover{transform:translateY(-1px);border-color:rgba(139,92,246,.5)}
+  .card.active{border-color:var(--accent)}
+  .cicon{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:21px;flex-shrink:0;background:linear-gradient(135deg,var(--c1),var(--c2))}
+  .cbody{flex:1;min-width:0}
+  .card h3{font-size:14px;font-weight:700;letter-spacing:-.01em;line-height:1.3;display:flex;align-items:center;gap:5px}
+  .card h3 .vv{color:var(--accent-2);font-size:12px}
+  .cmeta{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cside{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+  .pill{font-size:10px;font-weight:800;letter-spacing:.04em;padding:3px 9px;border-radius:999px}
+  .pill.free{background:rgba(52,211,153,.16);color:var(--free)}
+  .pill.paid{background:rgba(255,255,255,.06);color:var(--muted)}
+  body.light .pill.paid{background:#eef0f5}
+  .pill.pending{background:rgba(251,191,36,.15);color:var(--gold)}
+  .pill.private{background:rgba(157,123,255,.15);color:#b79bff;border:1px dashed #8b5cf6}
+  .pill.ver{background:rgba(56,189,248,.14);color:var(--accent-2)}
+  .mini{display:flex;gap:4px;align-items:center;font-size:11.5px;color:var(--muted)}
+  .mini button{border:none;background:none;color:var(--muted);cursor:pointer;font-size:12.5px;padding:2px 4px;border-radius:7px}
+  .mini button:hover{color:var(--text)}
+  .mini button.saved{color:#ff6b81}
+  .empty{padding:34px 22px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.6}
+  .pending-note{padding:9px 13px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:14px;font-size:12px;color:var(--gold);margin:2px 0 6px}
+
+  /* ---------- map ---------- */
+  #mapwrap{position:relative;padding:0 12px 12px 6px}
+  #map{width:100%;height:100%;z-index:1;border-radius:22px;background:#0b0e14}
+  .pin{display:grid;place-items:center;width:32px;height:32px;border-radius:50% 50% 50% 6px;transform:rotate(-45deg);border:2.5px solid var(--bg);box-shadow:0 3px 10px rgba(0,0,0,.45);cursor:pointer}
+  .pin span{transform:rotate(45deg);font-size:14px}
+  .pin.private{border-style:dashed;border-color:#8b5cf6}
+  .mpill{display:inline-flex;align-items:center;gap:5px;background:var(--glass);backdrop-filter:blur(8px);border:1.5px solid var(--c,#999);border-radius:999px;padding:4px 11px 4px 7px;font-size:11.5px;font-weight:700;color:var(--text);box-shadow:0 3px 12px rgba(0,0,0,.35);white-space:nowrap;cursor:pointer}
+  .mpill i{font-style:normal;font-size:13px}
+  .mpill.free::after{content:"FREE";font-size:8.5px;font-weight:800;color:var(--free);margin-left:3px;letter-spacing:.05em}
+  .searcharea{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:900;background:var(--glass);backdrop-filter:blur(10px);color:var(--text);border:1px solid var(--line);font-size:12.5px;font-weight:700;padding:10px 18px;border-radius:999px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35);display:none}
+  .searcharea.show{display:block}
+  .map-ctl{position:absolute;top:16px;left:20px;z-index:950;display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;max-width:calc(100% - 40px)}
+  .mbtn{height:40px;min-width:40px;border-radius:999px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3);padding:0 13px}
+  .mbtn:hover{border-color:var(--accent-2)}
+  .searchwrap{position:relative;display:flex;align-items:center;background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.3);height:40px;width:40px;transition:width .25s}
+  .searchwrap .mbtn{border:none;background:none;box-shadow:none;height:38px;min-width:38px;padding:0 11px}
+  .searchwrap input{width:0;opacity:0;border:none;background:none;color:var(--text);font:inherit;font-size:13px;transition:width .25s,opacity .2s;padding:0}
+  .searchwrap input::placeholder{color:var(--muted)}
+  .searchwrap input:focus{outline:none}
+  .searchwrap.open{width:262px}
+  .searchwrap.open input{width:200px;opacity:1;padding-right:10px}
+  .sugg{position:absolute;top:46px;left:0;width:262px;background:var(--raise);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.45);display:none;max-height:262px;overflow-y:auto;z-index:960}
+  .sugg.show{display:block}
+  .sugg .st{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:9px 13px 3px}
+  .sugg button{display:flex;gap:8px;align-items:center;width:100%;text-align:left;border:none;background:none;color:var(--text);font-size:13px;font-weight:600;padding:9px 13px;cursor:pointer}
+  .sugg button:hover{background:var(--surface)}
+  .seg{display:flex;background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;overflow:hidden;height:40px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+  .seg button{border:none;background:none;color:var(--muted);font-size:12px;font-weight:700;padding:0 13px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--grad);color:#fff}
+  .youdot{width:16px;height:16px;border-radius:50%;background:#38bdf8;border:3px solid #fff;box-shadow:0 0 0 6px rgba(56,189,248,.28)}
+  .cpin{position:relative;width:38px;height:38px;border-radius:50%;background:var(--raise);border:2.5px solid var(--c,#999);display:grid;place-items:center;font-size:16px;box-shadow:0 3px 10px rgba(0,0,0,.4);cursor:pointer}
+  .cpin.private{border-style:dashed;border-color:#8b5cf6}
+  .cpin i{position:absolute;top:-7px;right:-10px;font-style:normal;background:var(--grad);color:#fff;font-size:9px;font-weight:800;padding:2px 5px;border-radius:999px;border:1.5px solid var(--bg);line-height:1.2}
+  .filter-fab{position:absolute;top:16px;right:16px;z-index:950;width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);color:var(--text);font-size:15px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+  .filter-fab .fbadge{position:absolute;top:-6px;right:-6px;margin:0}
+  .bottomnav{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:960;display:flex;align-items:center;gap:5px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:999px;padding:7px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .bn-btn{width:44px;height:44px;border-radius:50%;border:none;background:none;color:var(--text);font-size:17px;cursor:pointer;display:grid;place-items:center}
+  .bn-btn:hover{background:var(--surface)}
+  .bn-main{width:54px;height:54px;border-radius:50%;border:none;background:var(--grad);color:#fff;font-size:21px;cursor:pointer;box-shadow:0 6px 18px rgba(139,92,246,.45);display:grid;place-items:center;margin:0 3px}
+  .bn-main:active{transform:scale(.94)}
+  .nd{display:inline-block;transition:transform .7s cubic-bezier(.2,.8,.3,1)}
+  .segwide{width:100%;height:42px;margin:0 0 4px}
+  .segwide button{flex:1}
+  .leaflet-popup-content-wrapper{border-radius:14px;font-family:inherit}
+  .leaflet-popup-content{margin:12px 14px;font-size:13px;line-height:1.45}
+
+  /* ---------- detail sheet ---------- */
+  .detail-ov{position:fixed;inset:0;background:rgba(5,7,12,.6);display:none;z-index:2500}
+  .detail-ov.open{display:block}
+  .detail{position:absolute;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--bg);overflow-y:auto;box-shadow:-16px 0 50px rgba(0,0,0,.5)}
+  .d-hero{height:160px;display:grid;place-items:center;font-size:56px;background:linear-gradient(135deg,var(--c1),var(--c2));position:relative;border-radius:0 0 26px 26px}
+  .d-close{position:absolute;top:14px;right:14px;background:rgba(10,12,18,.55);backdrop-filter:blur(6px);color:#fff;border:none;width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer}
+  .d-body{padding:20px 20px 32px}
+  .d-body h2{font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-bottom:4px}
+  .d-sub{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+  .d-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .d-badges .pill{font-size:10.5px;padding:4px 11px}
+  .d-summary{font-size:14px;line-height:1.65;color:var(--text);opacity:.88;margin-bottom:16px}
+  .d-facts{border:1px solid var(--line);border-radius:16px;padding:4px 15px;margin-bottom:16px;background:var(--surface)}
+  .d-fact{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;align-items:baseline}
+  .d-fact:last-child{border-bottom:none}
+  .d-fact .fl{color:var(--muted);min-width:64px;font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;font-weight:700}
+  .d-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .d-btn{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;text-align:center;text-decoration:none;display:block}
+  .d-btn:hover{border-color:var(--accent)}
+  .d-btn.primary{grid-column:1/-1;background:var(--grad);border:none;color:#fff}
+  .d-btn.plan{grid-column:1/-1;background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:var(--gold)}
+  .d-btn.saved{color:#ff6b81;border-color:rgba(255,107,129,.4)}
+
+  /* ---------- modals & toast ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(5,7,12,.65);display:none;place-items:center;z-index:3000;padding:16px}
+  .overlay.open{display:grid}
+  .modal{background:var(--bg);border:1px solid var(--line);border-radius:22px;max-width:440px;width:100%;padding:22px 22px 20px;max-height:90vh;overflow-y:auto}
+  .modal h2{font-size:17px;font-weight:800;letter-spacing:-.01em;margin-bottom:3px}
+  .modal p.sub{font-size:12.5px;color:var(--muted);margin-bottom:15px;line-height:1.5}
+  .field{margin-bottom:11px}
+  .field label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:5px}
+  .field input,.field select{width:100%;border:1px solid var(--line);border-radius:12px;padding:9px 11px;font:inherit;font-size:13.5px;background:var(--surface);color:var(--text)}
+  .field input:focus,.field select:focus{border-color:var(--accent)}
+  .vis-row{display:flex;gap:8px;margin:4px 0 14px}
+  .vis-opt{flex:1;border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer;font-size:12.5px;line-height:1.4;color:var(--muted);background:var(--surface)}
+  .vis-opt b{display:block;font-size:13px;color:var(--text)}
+  .vis-opt.sel{border-color:var(--accent);background:rgba(139,92,246,.1)}
+  .modal-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:6px}
+  .btn-ghost{background:none;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:8px 16px;font:inherit;font-size:13px;cursor:pointer}
+  .btn-primary{background:var(--grad);color:#fff;border:none;border-radius:999px;padding:9px 20px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+  .digest{max-width:520px}
+  .digest .mail-head{background:var(--grad);color:#fff;border-radius:16px;padding:14px 16px;margin-bottom:6px}
+  .digest .mail-head .from{font-size:11px;opacity:.85;margin-bottom:4px}
+  .digest .mail-head .subj{font-weight:800;font-size:15px;line-height:1.35;letter-spacing:-.01em}
+  .digest h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:14px 0 6px}
+  .digest .d-item{display:flex;gap:9px;padding:8px 2px;border-bottom:1px solid var(--line);font-size:13px;line-height:1.4;align-items:flex-start}
+  .digest .d-item:last-child{border-bottom:none}
+  .digest .d-item .de{font-size:16px}
+  .digest .d-item b{display:block;font-size:13.5px;font-weight:700}
+  .digest .d-item .dm{color:var(--muted);font-size:12px;display:block}
+  .digest .d-item a{color:var(--accent-2);font-size:12px;font-weight:700;text-decoration:none}
+  .digest .foot{margin-top:14px;font-size:11.5px;color:var(--muted);line-height:1.5;border-top:1px dashed var(--line);padding-top:10px}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--raise);border:1px solid var(--line);color:var(--text);padding:11px 18px;border-radius:999px;font-size:13px;z-index:4000;transition:transform .3s;box-shadow:0 8px 26px rgba(0,0,0,.45);max-width:88vw}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  .detail{transform:translateX(28px);opacity:0;transition:transform .28s cubic-bezier(.2,.8,.3,1),opacity .2s}
+  .detail-ov.open .detail{transform:none;opacity:1}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+  .mini button.saved,.d-btn.saved{animation:pop .3s ease}
+  .card:active{transform:scale(.99)}
+  .leaflet-bar{border:none!important;box-shadow:0 4px 14px rgba(0,0,0,.3)!important;border-radius:12px!important;overflow:hidden}
+  .leaflet-bar a{background:var(--glass)!important;backdrop-filter:blur(10px);color:var(--text)!important;border-bottom:1px solid var(--line)!important;width:36px!important;height:36px!important;line-height:36px!important}
+  .leaflet-bar a:last-child{border-bottom:none!important}
+  aside::-webkit-scrollbar{width:8px}
+  aside::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+  .e-ico{font-size:34px;margin-bottom:8px}
+  .e-row{display:flex;gap:8px;justify-content:center;margin-top:12px}
+
+  .appbanner{display:none;position:fixed;top:0;left:0;right:0;z-index:5000;align-items:center;gap:10px;background:var(--raise);border-bottom:1px solid var(--line);padding:10px 12px}
+  .appbanner .ab-t{flex:1;min-width:0;line-height:1.2}
+  .appbanner .ab-t b{font-size:13.5px;display:block}
+  .appbanner .ab-t span{font-size:11px;color:var(--muted)}
+  .ab-open{border:none;background:var(--grad);color:#fff;font-weight:700;font-size:12.5px;padding:8px 15px;border-radius:999px;cursor:pointer}
+  .ab-x{border:none;background:none;color:var(--muted);font-size:14px;cursor:pointer;padding:4px}
+  @media (max-width:760px){
+    .appbanner{display:flex}
+    body.hasbanner header{margin-top:56px}
+  }
+
+  /* ---------- mobile ---------- */
+  .sheet-toggle{display:none}
+  @media (max-width:760px){
+    #app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}
+    #mapwrap{padding:0}
+    #map{border-radius:0}
+    aside{position:fixed;left:0;right:0;bottom:0;top:auto;height:54vh;background:var(--bg);border-top:1px solid var(--line);border-radius:24px 24px 0 0;box-shadow:0 -12px 34px rgba(0,0,0,.45);transition:transform .28s;z-index:1400;padding:0 10px}
+    aside.closed{transform:translateY(calc(100% - 50px))}
+    .sheet-toggle{display:block;width:100%;background:none;border:none;padding:13px 0 5px;cursor:pointer}
+    .sheet-toggle i{display:block;width:44px;height:5px;border-radius:3px;background:var(--line);margin:0 auto}
+    header{padding:10px 12px 6px}
+    .bottomnav{bottom:64px}
+    .detail{width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body class="hasbanner">
+<div class="appbanner" id="appBanner">
+  <svg width="30" height="30" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="23" fill="url(#bg)"/><g transform="translate(50,50) rotate(28)"><path d="M0,-27 L9,2 L-9,2 Z" fill="#fff"/><path d="M0,27 L9,-2 L-9,-2 Z" fill="#fff" opacity=".45"/><circle r="5" fill="#fff"/></g></svg>
+  <div class="ab-t"><b>Whim</b><span>Smoother in the app — maps, saves & Thursday digests</span></div>
+  <button class="ab-open" id="abOpen">Open app</button>
+  <button class="ab-x" id="abX" aria-label="Dismiss">✕</button>
+</div>
+<div id="app">
+  <header>
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="55%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs><rect width="100" height="100" rx="23" fill="url(#bg)"/><g transform="translate(50,50) rotate(28)"><path d="M0,-27 L9,2 L-9,2 Z" fill="#fff"/><path d="M0,27 L9,-2 L-9,-2 Z" fill="#fff" opacity=".45"/><circle r="5" fill="#fff"/><circle r="2.2" fill="#38bdf8"/></g></svg>
+      <b>Whim</b>
+    </div>
+    <div class="hscroll">
+      <div class="tseg" role="group" aria-label="Time range">
+        <button data-range="today">Tonight</button>
+        <button data-range="weekend">Weekend</button>
+        <button data-range="week" aria-pressed="true">7 days</button>
+        <button data-range="extended">3 weeks</button>
+      </div>
+      <button class="chip free-chip" id="freeChip" aria-pressed="false">✦ Free</button>
+    </div>
+  </header>
+
+  <div class="daystrip" id="daystrip" role="group" aria-label="Pick a day"></div>
+
+  <aside id="panel">
+    <button class="sheet-toggle" id="sheetToggle" aria-label="Expand or collapse list"><i></i></button>
+    <div class="panel-head">
+      <div style="flex:1;min-width:0">
+        <div class="ph-title">Happening near you</div>
+        <div class="ph-sub"><b id="count">0</b> events · near <span id="homeName">Seattle</span></div>
+      </div>
+      <button class="area-chip" id="areaChip" style="display:none">Map area ✕</button>
+      <select class="sort" id="sortSel" aria-label="Sort events">
+        <option value="date">Date</option>
+        <option value="saves">Most saved</option>
+        <option value="near">Near map center</option>
+      </select>
+    </div>
+    <div id="railWrap">
+      <div class="rail-head"><b>✦ Whims of the week</b><span>hand-picked</span></div>
+      <div class="rail" id="rail"></div>
+    </div>
+    <div class="cards" id="cards"></div>
+  </aside>
+
+  <div id="mapwrap">
+    <div id="map"></div>
+    <div class="map-ctl">
+      <div class="searchwrap" id="searchWrap">
+        <button class="mbtn" id="searchBtn" aria-label="Search a city or region">🔍</button>
+        <input id="searchInput" placeholder="Search a city or region…" aria-label="Search a city or region" maxlength="40">
+        <div class="sugg" id="sugg"></div>
+      </div>
+    </div>
+    <button class="filter-fab" id="openFilters" aria-label="Filters">☰<span class="fbadge" id="fBadge" hidden>0</span></button>
+    <nav class="bottomnav" aria-label="Quick actions">
+      <button class="bn-btn" id="openDigest" aria-label="Weekend digest" title="Weekend digest">📬</button>
+      <button class="bn-btn" id="spinBtn" aria-label="Spin the needle — pick a random event" title="Spin the needle"><span class="nd">🧭</span></button>
+      <button class="bn-main" id="nearBtn" aria-label="Near me" title="Near me">📍</button>
+      <button class="bn-btn" id="themeToggle" aria-label="Toggle light or dark mode" title="Theme">☀️</button>
+      <button class="bn-btn" id="openSubmit" aria-label="Add an event" title="Add an event">＋</button>
+    </nav>
+    <button class="searcharea" id="searchArea">Search this area</button>
+  </div>
+</div>
+
+<!-- detail sheet -->
+<div class="detail-ov" id="detailOv"><div class="detail" id="detailPane"></div></div>
+
+<!-- filters sheet -->
+<div class="overlay" id="filterOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ftTitle">
+    <h2 id="ftTitle">Filters</h2>
+    <p class="sub">Dial in how far you'll go and what you're in the mood for. Changes apply instantly.</p>
+    <div class="fsec">Map markers</div>
+    <div class="seg segwide" role="group" aria-label="Marker style">
+      <button id="segIcons" aria-pressed="true">● Icons</button>
+      <button id="segLabels" aria-pressed="false">🏷 Labels</button>
+    </div>
+    <div class="fsec">How far will you go?</div>
+    <div class="drive-row">
+      <button class="fopt" data-drive="0"><b>In-city</b><span>Seattle only</span></button>
+      <button class="fopt" data-drive="1"><b>&lt;1 hr</b><span>quick hop</span></button>
+      <button class="fopt" data-drive="2"><b>&lt;2 hr</b><span>day trip</span></button>
+      <button class="fopt" data-drive="3" aria-pressed="true"><b>&lt;3 hr</b><span>road trip</span></button>
+    </div>
+    <div class="fsec">In the mood for · <button class="flink" id="catAll">all</button> / <button class="flink" id="catNone">none</button></div>
+    <div class="cat-grid" id="catGrid"></div>
+    <div class="modal-actions"><button class="btn-primary" id="closeFilters">Done</button></div>
+  </div>
+</div>
+
+<!-- submit modal -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <h2 id="mTitle">Add an event</h2>
+    <p class="sub">Public events go to a moderator queue and appear once approved. Private events pin instantly — only you see them.</p>
+    <div class="vis-row" id="visRow">
+      <div class="vis-opt sel" data-vis="public" tabindex="0"><b>Public</b>Needs approval · everyone sees it</div>
+      <div class="vis-opt" data-vis="private" tabindex="0"><b>Private</b>Instant · only on your map</div>
+    </div>
+    <div class="field"><label for="fName">Event name</label><input id="fName" placeholder="e.g. Green Lake picnic meetup" maxlength="80"></div>
+    <div class="field"><label for="fCat">Category</label><select id="fCat"></select></div>
+    <div class="field"><label for="fStart">Starts</label><input id="fStart" type="date" min="2026-07-15" value="2026-07-16"></div>
+    <div class="field"><label for="fEnd">Ends</label><input id="fEnd" type="date" min="2026-07-15" value="2026-07-16"></div>
+    <div class="field"><label for="fPlace">Location</label><input id="fPlace" placeholder="e.g. Gas Works Park, Seattle" maxlength="90"></div>
+    <div class="field"><label for="fUrl">Official link (optional)</label><input id="fUrl" placeholder="https://…" maxlength="200"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelSubmit">Cancel</button>
+      <button class="btn-primary" id="saveSubmit">Save event</button>
+    </div>
+  </div>
+</div>
+
+<!-- weekly digest modal -->
+<div class="overlay" id="digestOverlay">
+  <div class="modal digest" role="dialog" aria-modal="true" aria-labelledby="dSubj">
+    <div class="mail-head">
+      <div class="from">Whim &lt;hello@whim.app&gt; · Thursday 3:02 PM · to you</div>
+      <div class="subj" id="dSubj"></div>
+    </div>
+    <div id="dBody"></div>
+    <div class="foot">Prototype of the weekly ritual: this lands every Thursday afternoon, built from your categories and drive radius. Save events (♥) to shape next week's whims.</div>
+    <div class="modal-actions"><button class="btn-primary" id="closeDigest">Close</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ helpers ============ */
+const $ = s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc = s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = d=>new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+const overlap=(ev,s,e)=>!(ev.e<s||ev.s>e);
+const grad=cat=>{const r=CATS[cat].raw;return `--c1:${r};--c2:${r}88`};
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._x); t._x=setTimeout(()=>t.classList.remove("show"),3000); }
+
+/* ============ data ============ */
+const CATS = {
+  festival:{e:"🎪",raw:"#ff6b57",label:"Festivals"},
+  music:{e:"🎵",raw:"#9d7bff",label:"Music"},
+  food:{e:"🍜",raw:"#ffb347",label:"Food"},
+  art:{e:"🎨",raw:"#ff6fb5",label:"Art"},
+  film:{e:"🎬",raw:"#5ea8ff",label:"Film"},
+  theater:{e:"🎭",raw:"#43d3ae",label:"Theater"},
+  community:{e:"🎉",raw:"#6fd66f",label:"Community"},
+  market:{e:"🌙",raw:"#c99a6d",label:"Markets"},
+  outdoor:{e:"🚵",raw:"#3fd699",label:"Outdoor"},
+};
+const DRIVE_LABEL = ["In-city","<1 hr","1–2 hr","2–3 hr"];
+const EVENTS = [
+ {t:"Dancing 'til Dusk",s:"2026-07-16",e:"2026-07-23",v:"Downtown Seattle parks (Tue & Thu)",lat:47.6107,lng:-122.3375,cat:"community",url:"https://www.dancingtildusk.com",free:true,ver:true,pick:true,sum:"Free one-hour dance lesson, then dancing in a downtown park. Tuesdays & Thursdays through August."},
+ {t:"GreenStage: Shakespeare in the Park",s:"2026-07-15",e:"2026-08-05",v:"Various Seattle parks",lat:47.6303,lng:-122.3148,cat:"theater",url:"https://greenstage.org",free:true,ver:true,sum:"Free outdoor Shakespeare in parks around the city — bring a blanket and a picnic. Runs through Aug 15."},
+ {t:"Wooden O: Macbeth",s:"2026-07-15",e:"2026-08-05",v:"Puget Sound area parks",lat:47.6806,lng:-122.3286,cat:"theater",url:"https://www.seattleshakespeare.org",free:true,ver:true,sum:"Seattle Shakespeare's free summer staging of the Scottish play, touring parks through mid-August."},
+ {t:"Center City Cinema (outdoor movies)",s:"2026-07-15",e:"2026-08-05",v:"Various downtown parks",lat:47.6003,lng:-122.3331,cat:"film",url:"https://downtownseattle.org",free:true,ver:true,sum:"Parks become open-air theaters at 7:30pm. Bring blankets, chairs and snacks; weather permitting."},
+ {t:"Birds of Play circus cabaret",s:"2026-07-15",e:"2026-07-25",v:"Seattle Public Theater, Green Lake (18+)",lat:47.6795,lng:-122.3410,cat:"theater",url:"https://www.seattlepublictheater.org",free:false,ver:true,sum:"Aerialism, burlesque and drag in Green Lake's historic bathhouse theater."},
+ {t:"SCMS Summer Festival in Bellevue",s:"2026-07-15",e:"2026-07-17",v:"Meydenbauer Center, Bellevue",lat:47.6144,lng:-122.1923,cat:"music",url:"https://www.seattlechambermusic.org",free:false,ver:true,sum:"Seattle Chamber Music Society's summer festival crosses the lake — concerts July 15 and 17."},
+ {t:"14/48: The World's Quickest Theater Festival",s:"2026-07-17",e:"2026-07-18",v:"Seattle Center Armory",lat:47.6215,lng:-122.3517,cat:"theater",url:"https://the1448projects.org",free:false,ver:true,sum:"Fourteen plays written, cast, scored and premiered in 48 hours — chaotic and ever-surprising."},
+ {t:"Seafair Indian Days Powwow",s:"2026-07-17",e:"2026-07-19",v:"Daybreak Star Center, Discovery Park",lat:47.6645,lng:-122.4260,cat:"festival",url:"https://www.unitedindians.org",free:true,ver:true,pick:true,sum:"Competitive dancing, drumming, Native arts and traditional foods outdoors in Discovery Park."},
+ {t:"Alki Art Fair",s:"2026-07-17",e:"2026-07-19",v:"Alki Beach Park, West Seattle",lat:47.5812,lng:-122.4076,cat:"art",url:"https://alkiartfair.org",free:true,ver:true,pick:true,sum:"Artist booths, live music and sandy toes along the Alki promenade."},
+ {t:"Mariners homestand (Giants Fri–Sat, Reds Sun)",s:"2026-07-17",e:"2026-07-19",v:"T-Mobile Park, SoDo",lat:47.5914,lng:-122.3325,cat:"community",url:"https://www.mlb.com/mariners",free:false,ver:true,sum:"Friday 7:10, Saturday 5:08 vs San Francisco; Sunday afternoon vs Cincinnati."},
+ {t:"West Seattle Grand Parade",s:"2026-07-18",e:"2026-07-18",v:"California Ave SW, West Seattle",lat:47.5615,lng:-122.3867,cat:"community",url:"#",free:true,ver:true,sum:"Running since 1935: pirates, clowns, marching bands, drill teams and floats, 11am–2pm."},
+ {t:"Blastfest (Wizkid · Mustard · Shenseea)",s:"2026-07-18",e:"2026-07-18",v:"Fisher Pavilion, Seattle Center",lat:47.6205,lng:-122.3509,cat:"music",url:"https://www.seattlecenter.com",free:false,ver:true,sum:"The West Coast's biggest Afrobeats festival — Wizkid, Mustard, Shenseea, Tyler ICU, Pheelz. 21+, gates 2pm."},
+ {t:"Jimmy Eat World + Motion City Soundtrack",s:"2026-07-18",e:"2026-07-18",v:"WaMu Theater",lat:47.5952,lng:-122.3316,cat:"music",url:"#",free:false,ver:true,sum:"Emo-adjacent triple bill with Illuminati Hotties, 7pm."},
+ {t:"Downtown Seattle Block Party",s:"2026-07-18",e:"2026-07-19",v:"Downtown near Nordstrom",lat:47.6120,lng:-122.3358,cat:"community",url:"#",free:true,ver:false,sum:"Two-day block party: live music, dozens of vendors, kids zone, food trucks and a 21+ beer garden. Confirm days on official listings."},
+ {t:"Bon Odori Festival",s:"2026-07-18",e:"2026-07-19",v:"Seattle Betsuin Buddhist Temple, S Main St",lat:47.5995,lng:-122.3140,cat:"festival",url:"https://seattlebetsuin.com",free:true,ver:false,sum:"Japanese folk dancing at 4pm, taiko drums, beer garden and street food honoring ancestors."},
+ {t:"Chinatown Seafair Parade",s:"2026-07-19",e:"2026-07-19",v:"Chinatown-International District",lat:47.5985,lng:-122.3243,cat:"community",url:"https://www.seafair.org",free:true,ver:true,pick:true,sum:"Lion and dragon dances, a 100-foot dragon, martial arts and the Chinese Community Girls Drill Team, 7pm."},
+ {t:"World Cup Final watch party",s:"2026-07-19",e:"2026-07-19",v:"Pike Place Market cobblestones",lat:47.6097,lng:-122.3422,cat:"community",url:"#",free:true,ver:false,pick:true,sum:"An 18-foot big screen on the cobblestones for the FIFA World Cup Final, noon–3pm."},
+ {t:"Joji with Nate Sib and Corbin",s:"2026-07-19",e:"2026-07-19",v:"Climate Pledge Arena",lat:47.6221,lng:-122.3541,cat:"music",url:"#",free:false,ver:true,sum:"Joji headlines Climate Pledge, 7:30pm."},
+ {t:"ZooTunes opening night",s:"2026-07-19",e:"2026-07-19",v:"Woodland Park Zoo",lat:47.6685,lng:-122.3540,cat:"music",url:"https://www.zoo.org",free:false,ver:true,sum:"The zoo's beloved summer concert series kicks off its 2026 season on the North Meadow."},
+ {t:"Seafair Fleet Week",s:"2026-07-21",e:"2026-07-24",v:"Pier 66 & Seattle waterfront",lat:47.6114,lng:-122.3480,cat:"community",url:"https://www.seafair.org",free:true,ver:true,sum:"Parade of ships Jul 21 at 1pm, then ship tours (Jul 22–23, ID required), military dog demos and displays."},
+ {t:"Hell's Kitchen at the Paramount",s:"2026-07-21",e:"2026-07-26",v:"Paramount Theatre, downtown",lat:47.6131,lng:-122.3314,cat:"theater",url:"https://www.stgpresents.org",free:false,ver:false,sum:"Alicia Keys' coming-of-age Broadway musical opens Jul 21 — check the site for the full run."},
+ {t:"Chateau Ste. Michelle summer concerts",s:"2026-07-21",e:"2026-08-05",v:"Chateau Ste. Michelle, Woodinville",lat:47.7300,lng:-122.1519,cat:"music",url:"https://www.ste-michelle.com",free:false,ver:true,sum:"Jazz, rock and blues in the winery amphitheater through September — lawn tickets welcome low chairs."},
+ {t:"Bite of Seattle",s:"2026-07-24",e:"2026-07-26",v:"Seattle Center",lat:47.6205,lng:-122.3493,cat:"food",url:"https://biteofseattle.com",free:true,ver:true,pick:true,sum:"300+ food vendors, live music, beer gardens and cooking demos. Free admission; bring an appetite."},
+ {t:"Seattle Art Fair",s:"2026-07-23",e:"2026-07-26",v:"Lumen Field Event Center",lat:47.5915,lng:-122.3327,cat:"art",url:"https://seattleartfair.com",free:false,ver:true,sum:"Galleries from around the world fill the event center for the region's biggest art fair."},
+ {t:"Urban Craft Uprising summer show",s:"2026-07-25",e:"2026-07-26",v:"Hangar 30, Magnuson Park",lat:47.6810,lng:-122.2560,cat:"market",url:"https://www.urbancraftuprising.com",free:true,ver:true,sum:"The Northwest's big indie craft show — makers, prints, ceramics and snacks in the hangar."},
+ /* ---- under 1 hr ---- */
+ {t:"Kla Ha Ya Days",s:"2026-07-15",e:"2026-07-19",v:"Downtown Snohomish",lat:47.9129,lng:-122.0982,cat:"community",url:"https://klahayadays.com",free:true,ver:true,sum:"Old-fashioned summer fair: pancake breakfast, Frogtastic Kids Fair, parade, balloon glow and street fair."},
+ {t:"Washington Midsummer Renaissance Faire",s:"2026-07-18",e:"2026-07-19",v:"Meadow Wood Equestrian Center, Snohomish",lat:47.8554,lng:-122.0430,cat:"festival",url:"https://washingtonfaire.com",free:false,ver:true,sum:"Knights, jesters and alehouses — weekends Jul 18 to Aug 16, Fri & Sat evenings until midnight."},
+ {t:"SandBlast Festival of the Arts",s:"2026-07-18",e:"2026-07-19",v:"McCormick Park, Duvall",lat:47.7423,lng:-121.9857,cat:"art",url:"#",free:true,ver:true,sum:"A master sand carver at work, live local music and artist booths by the river."},
+ {t:"Rock The Boat 2026",s:"2026-07-17",e:"2026-07-18",v:"Port of Everett waterfront (21+)",lat:47.9927,lng:-122.2210,cat:"music",url:"#",free:false,ver:true,sum:"Friday is country (Pam Tillis, Little Texas); Saturday is 90s alt nostalgia (Everclear, Marcy Playground, Deep Blue Something). From 3:30pm."},
+ {t:"The Game at Tulalip Amphitheatre",s:"2026-07-18",e:"2026-07-18",v:"Tulalip Amphitheatre, Marysville",lat:48.0873,lng:-122.2680,cat:"music",url:"#",free:false,ver:true,sum:"West Coast hip-hop under the open sky, 7pm."},
+ {t:"The Hoot Music & Arts Festival",s:"2026-07-17",e:"2026-07-19",v:"Tulalip",lat:48.0629,lng:-122.2857,cat:"music",url:"#",free:false,ver:false,sum:"Weekend music and arts gathering near the Salish Sea."},
+ {t:"Kirkland Uncorked",s:"2026-07-17",e:"2026-07-19",v:"Marina Park, Kirkland",lat:47.6769,lng:-122.2085,cat:"food",url:"https://www.kirklanduncorked.com",free:false,ver:false,sum:"Washington wine, food trucks and art on the Kirkland waterfront — confirm exact days on the site."},
+ {t:"Tacoma Porchfest",s:"2026-07-17",e:"2026-07-19",v:"Central Tacoma neighborhoods",lat:47.2529,lng:-122.4560,cat:"music",url:"#",free:true,ver:false,sum:"Live music on 50+ porches around central Tacoma — bring a portable chair; check the map and days."},
+ {t:"Remlinger Farms concerts",s:"2026-07-18",e:"2026-08-05",v:"Remlinger Farms, Carnation",lat:47.6479,lng:-121.9139,cat:"music",url:"https://www.remlingerfarms.com",free:false,ver:true,sum:"Outdoor concert series on the farm, running into September — shuttle buses from Seattle and Bellevue."},
+ {t:"Timber! Outdoor Music Festival",s:"2026-07-23",e:"2026-07-26",v:"Tolt River–John MacDonald Park, Carnation",lat:47.6485,lng:-121.9223,cat:"music",url:"https://timbermusicfest.com",free:false,ver:true,sum:"Camp-out festival with 25 artists plus nature walks, yoga, a 5K and stargazing."},
+ {t:"Bellevue Arts Fair Weekend",s:"2026-07-24",e:"2026-07-26",v:"Downtown Bellevue",lat:47.6154,lng:-122.2030,cat:"art",url:"https://www.bellevuearts.org",free:true,ver:true,sum:"One of the Northwest's largest arts festivals fills downtown Bellevue."},
+ {t:"Redmond Derby Days",s:"2026-07-24",e:"2026-07-25",v:"Redmond City Hall campus",lat:47.6787,lng:-122.1213,cat:"community",url:"https://www.redmond.gov",free:true,ver:true,sum:"Kids bike parade, grand parade, carnival rides and a lighted drone show finale."},
+ {t:"Renton River Days",s:"2026-07-23",e:"2026-07-26",v:"Liberty Park, Renton",lat:47.4822,lng:-122.2040,cat:"community",url:"https://www.rentonwa.gov",free:true,ver:true,sum:"Multi-day family festival: parade, arts and crafts, food trucks and live entertainment."},
+ /* ---- 1–3 hr ---- */
+ {t:"Capital Lakefair",s:"2026-07-15",e:"2026-07-19",v:"Heritage Park, Olympia",lat:47.0417,lng:-122.9040,cat:"festival",url:"https://www.lakefair.org",free:true,ver:true,sum:"Carnival rides, car show Friday, parade Saturday 5pm, fireworks Sunday 10:15pm over Capitol Lake."},
+ {t:"Allyn Days Salmon Bake & Geoduck Festival",s:"2026-07-15",e:"2026-07-17",v:"Allyn, Hood Canal",lat:47.3843,lng:-122.8271,cat:"food",url:"https://www.explorehoodcanal.com",free:true,ver:false,sum:"Salmon bake and geoduck festivities on the Hood Canal shore."},
+ {t:"Darrington Bluegrass Festival",s:"2026-07-17",e:"2026-07-19",v:"Darrington Bluegrass Music Park",lat:48.2543,lng:-121.6010,cat:"music",url:"https://darringtonbluegrass.com",free:false,ver:true,sum:"46th annual mountain-valley bluegrass weekend. Kids 12 and under free; camping on site."},
+ {t:"Northwest Raspberry Festival",s:"2026-07-17",e:"2026-07-18",v:"Historic Downtown Lynden",lat:48.9460,lng:-122.4520,cat:"food",url:"#",free:true,ver:true,sum:"Berry farm tours, car show, kids zone and vendor markets in Lynden's Dutch-flavored downtown."},
+ {t:"Sequim Lavender Festival",s:"2026-07-17",e:"2026-07-19",v:"Carrie Blake Park, Sequim",lat:48.0837,lng:-123.0870,cat:"festival",url:"https://lavenderfestival.com",free:true,ver:true,sum:"Purple fields, farm tours and craft booths on the Olympic Peninsula — worth the ferry."},
+ {t:"Bellingham Festival of Music",s:"2026-07-15",e:"2026-07-17",v:"Bellingham (various venues)",lat:48.7370,lng:-122.4880,cat:"music",url:"https://bellinghamfestival.org",free:false,ver:true,sum:"Final week: orchestral concerts at WWU plus free pop-up chamber music around town."},
+ {t:"Sandsations Sand Sculpture Festival",s:"2026-07-15",e:"2026-07-18",v:"Bolstad Beach Approach, Long Beach",lat:46.3523,lng:-124.0543,cat:"outdoor",url:"https://funbeach.com",free:true,ver:false,sum:"Competitive sand sculpting on the Pacific, plus lessons, live music, vendors and kites."},
+ {t:"Winthrop Rhythm & Blues Festival",s:"2026-07-17",e:"2026-07-19",v:"Winthrop (~3.5 hr — a stretch)",lat:48.4735,lng:-120.1860,cat:"music",url:"https://winthropbluesfestival.com",free:false,ver:true,sum:"The state's longest-running blues fest, riverside in the Methow Valley. Slightly past the 3-hour line."},
+ /* ---- North America sample coverage (recurring series; dates illustrative — verify on official sites) ---- */
+ {t:"SummerStage in Central Park",s:"2026-07-15",e:"2026-07-22",v:"Rumsey Playfield, Central Park, NYC",lat:40.7712,lng:-73.9700,cat:"music",url:"https://cityparksfoundation.org",free:true,ver:false,sum:"Free outdoor concerts all summer in the park — check the calendar for this week's lineup."},
+ {t:"Bryant Park Picnic Performances",s:"2026-07-15",e:"2026-07-22",v:"Bryant Park, Midtown, NYC",lat:40.7536,lng:-73.9832,cat:"community",url:"https://bryantpark.org",free:true,ver:false,sum:"Free music, dance and theater on the lawn — bring a blanket, arrive early for space."},
+ {t:"Smorgasburg Williamsburg",s:"2026-07-18",e:"2026-07-18",v:"Marsha P. Johnson State Park, Brooklyn",lat:40.7217,lng:-73.9576,cat:"food",url:"https://www.smorgasburg.com",free:true,ver:false,sum:"America's biggest open-air food market — 100ish vendors every Saturday, East River views."},
+ {t:"Hollywood Bowl summer season",s:"2026-07-15",e:"2026-07-22",v:"Hollywood Bowl, Los Angeles",lat:34.1122,lng:-118.3391,cat:"music",url:"https://www.hollywoodbowl.com",free:false,ver:false,sum:"LA Phil and headliners under the stars — the definitive LA summer night. Check the week's program."},
+ {t:"Smorgasburg LA",s:"2026-07-19",e:"2026-07-19",v:"ROW DTLA, Los Angeles",lat:34.0331,lng:-118.2337,cat:"food",url:"https://www.smorgasburg.com",free:true,ver:false,sum:"Sunday open-air food market downtown — free entry, come hungry."},
+ {t:"Stern Grove Festival",s:"2026-07-19",e:"2026-07-19",v:"Sigmund Stern Grove, San Francisco",lat:37.7355,lng:-122.4767,cat:"music",url:"https://www.sterngrove.org",free:true,ver:false,sum:"Free Sunday concerts in a eucalyptus grove — an SF summer institution since 1938."},
+ {t:"Millennium Park summer concerts",s:"2026-07-16",e:"2026-07-20",v:"Pritzker Pavilion, Chicago",lat:41.8826,lng:-87.6226,cat:"music",url:"#",free:true,ver:false,sum:"Free evening concerts at the Pritzker Pavilion — bring wine and a picnic to the Great Lawn."},
+ {t:"Navy Pier summer fireworks",s:"2026-07-15",e:"2026-07-18",v:"Navy Pier, Chicago",lat:41.8917,lng:-87.6086,cat:"community",url:"https://navypier.org",free:true,ver:false,sum:"Fireworks over Lake Michigan, typically Wednesday and Saturday nights all summer."},
+ {t:"Blues on the Green",s:"2026-07-15",e:"2026-07-15",v:"Zilker Park, Austin",lat:30.2669,lng:-97.7729,cat:"music",url:"#",free:true,ver:false,sum:"Austin's beloved free summer concert series on the Zilker lawn — tonight."},
+ {t:"City Park Jazz",s:"2026-07-19",e:"2026-07-19",v:"City Park Pavilion, Denver",lat:39.7477,lng:-104.9500,cat:"music",url:"https://cityparkjazz.org",free:true,ver:false,sum:"Free Sunday-evening jazz by the lake — a Denver summer ritual."},
+ {t:"Landmarks Orchestra at the Hatch Shell",s:"2026-07-15",e:"2026-07-15",v:"DCR Hatch Shell, Boston",lat:42.3563,lng:-71.0724,cat:"music",url:"#",free:true,ver:false,sum:"Free orchestral concert tonight on the Charles River Esplanade."},
+ {t:"Portland Saturday Market",s:"2026-07-18",e:"2026-07-19",v:"Tom McCall Waterfront Park, Portland, OR",lat:45.5225,lng:-122.6699,cat:"market",url:"https://www.portlandsaturdaymarket.com",free:true,ver:false,sum:"The largest continuously operating open-air arts and crafts market in the US — weekends through December."},
+ {t:"Harbourfront Centre summer series",s:"2026-07-15",e:"2026-07-22",v:"Harbourfront Centre, Toronto",lat:43.6387,lng:-79.3816,cat:"community",url:"https://harbourfrontcentre.com",free:true,ver:false,sum:"Free lakeside music, dance and festivals all summer on Toronto's waterfront."},
+ {t:"Beaches International Jazz Festival",s:"2026-07-24",e:"2026-07-26",v:"Kew Gardens & Queen St E, Toronto",lat:43.6689,lng:-79.2996,cat:"music",url:"https://beachesjazz.com",free:true,ver:false,sum:"Free streetfest and jazz stages in Toronto's east end — late July; check dates."},
+ {t:"Vancouver Folk Music Festival",s:"2026-07-17",e:"2026-07-19",v:"Jericho Beach Park, Vancouver, BC",lat:49.2726,lng:-123.1963,cat:"music",url:"https://thefestival.bc.ca",free:false,ver:false,pick:true,sum:"Mid-July weekend of folk and roots on the beach with mountain views."},
+ {t:"Just for Laughs Festival",s:"2026-07-15",e:"2026-07-26",v:"Quartier des Spectacles, Montr\u00e9al",lat:45.5088,lng:-73.5670,cat:"theater",url:"https://www.hahaha.com",free:false,ver:false,sum:"The world's largest comedy festival takes over downtown Montr\u00e9al \u2014 free outdoor shows plus ticketed galas."},
+ {t:"Lucha Libre at Arena M\u00e9xico",s:"2026-07-17",e:"2026-07-17",v:"Arena M\u00e9xico, Mexico City",lat:19.4260,lng:-99.1500,cat:"community",url:"#",free:false,ver:false,sum:"Masked wrestling Friday night \u2014 the cathedral of lucha libre."},
+];
+const slug = t=>t.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"").slice(0,40);
+EVENTS.forEach((ev,i)=>{ ev._id=slug(ev.t); ev.sv=5+(i*7)%38+(ev.free?6:0); });
+const saved = new Set();
+
+/* ============ state ============ */
+const state = {
+  range:{s:"2026-07-15",e:"2026-07-22"}, rangeKey:"week", day:null,
+  drive:3, cats:new Set(Object.keys(CATS)), freeOnly:false,
+  sort:"date", bounds:null, userEvents:[], activeId:null, markerMode:"icons",
+  home:{name:"Seattle",lat:47.6062,lng:-122.3321},
+};
+const KM=(a,b,c,d)=>{const R=6371,r=Math.PI/180,dLa=(c-a)*r,dLo=(d-b)*r,x=Math.sin(dLa/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(x));};
+const bandOf=ev=>{const k=KM(state.home.lat,state.home.lng,ev.lat,ev.lng);return k<30?0:k<95?1:k<190?2:k<300?3:4;};
+
+/* ============ map ============ */
+const map = L.map("map",{zoomControl:false}).setView([47.61,-122.33],10);
+L.control.zoom({position:"bottomright"}).addTo(map);
+const darkTiles=L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:'&copy; OpenStreetMap contributors &copy; CARTO',maxZoom:19});
+const lightTiles=L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{attribution:'&copy; OpenStreetMap contributors &copy; CARTO',maxZoom:19});
+darkTiles.addTo(map);
+let markers = [], userMoved = false;
+
+function makeIcon(ev){
+  const c = CATS[ev.cat], priv = ev.status==="private";
+  if(state.markerMode==="labels" && map.getZoom()>=9){
+    const short = esc(ev.t.length>22 ? ev.t.slice(0,21)+"…" : ev.t);
+    return L.divIcon({className:"",html:
+      `<div class="mpill ${ev.free?"free":""}" style="--c:${c.raw};${priv?"border-style:dashed;border-color:#8b5cf6":""}"><i>${c.e}</i>${short}</div>`,
+      iconSize:null,iconAnchor:[16,16],popupAnchor:[40,-10]});
+  }
+  return L.divIcon({className:"",html:
+    `<div class="cpin ${priv?"private":""}" style="--c:${c.raw}"><span>${c.e}</span>${ev.sv?`<i>+${(ev.sv||0)+(saved.has(ev._id)?1:0)}</i>`:""}</div>`,
+    iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-22]});
+}
+map.on("zoomend",()=>markers.forEach(m=>m.setIcon(makeIcon(m._ev))));
+map.on("movestart",()=>{userMoved=true});
+map.on("moveend",()=>{ if(userMoved) $("#searchArea").classList.add("show"); });
+$("#searchArea").addEventListener("click",()=>{
+  state.bounds = map.getBounds();
+  $("#searchArea").classList.remove("show");
+  $("#areaChip").style.display="inline-block";
+  render();
+});
+$("#areaChip").addEventListener("click",()=>{state.bounds=null;$("#areaChip").style.display="none";render();});
+
+/* ============ city / region search ============ */
+const PLACES=[
+ {n:"Seattle",lat:47.6062,lng:-122.3321,z:11,m:1},{n:"Ballard, Seattle",lat:47.6684,lng:-122.3847,z:13},
+ {n:"Capitol Hill, Seattle",lat:47.6253,lng:-122.3222,z:13},{n:"West Seattle",lat:47.5667,lng:-122.3868,z:12},
+ {n:"Bellevue",lat:47.6101,lng:-122.2015,z:12},{n:"Redmond",lat:47.6740,lng:-122.1215,z:12},
+ {n:"Kirkland",lat:47.6769,lng:-122.2060,z:12},{n:"Edmonds",lat:47.8107,lng:-122.3774,z:12},
+ {n:"Everett",lat:47.9790,lng:-122.2021,z:12},{n:"Tacoma",lat:47.2529,lng:-122.4443,z:12},
+ {n:"Olympia",lat:47.0379,lng:-122.9007,z:12},{n:"Bremerton",lat:47.5673,lng:-122.6326,z:12},
+ {n:"Kent",lat:47.3809,lng:-122.2348,z:12},{n:"Puyallup",lat:47.1854,lng:-122.2929,z:12},
+ {n:"Woodinville",lat:47.7543,lng:-122.1635,z:12},{n:"Bellingham",lat:48.7519,lng:-122.4787,z:12},
+ {n:"Mount Vernon",lat:48.4212,lng:-122.3341,z:12},{n:"Carnation",lat:47.6479,lng:-121.9139,z:12},
+ {n:"Tulalip",lat:48.0685,lng:-122.2646,z:12},{n:"Sultan",lat:47.8626,lng:-121.8168,z:12},
+ {n:"Darrington",lat:48.2543,lng:-121.6010,z:12},{n:"Shelton",lat:47.2151,lng:-123.1007,z:12},
+ {n:"Lacey",lat:47.0343,lng:-122.8232,z:12},{n:"Allyn, Hood Canal",lat:47.3843,lng:-122.8271,z:12},
+ {n:"Long Beach, WA",lat:46.3523,lng:-124.0543,z:12},{n:"Winthrop",lat:48.4735,lng:-120.1860,z:12},
+ {n:"Leavenworth",lat:47.5962,lng:-120.6615,z:12},{n:"Snoqualmie",lat:47.5287,lng:-121.8254,z:12},
+ {n:"Portland, OR",lat:45.5152,lng:-122.6784,z:11,m:1},{n:"Vancouver, BC",lat:49.2827,lng:-123.1207,z:11,m:1},
+ {n:"New York City",lat:40.7128,lng:-74.0060,z:11,m:1},{n:"Brooklyn",lat:40.6782,lng:-73.9442,z:12},
+ {n:"Los Angeles",lat:34.0522,lng:-118.2437,z:10,m:1},{n:"San Francisco",lat:37.7749,lng:-122.4194,z:11,m:1},
+ {n:"San Diego",lat:32.7157,lng:-117.1611,z:11,m:1},{n:"Las Vegas",lat:36.1699,lng:-115.1398,z:11,m:1},
+ {n:"Phoenix",lat:33.4484,lng:-112.0740,z:11,m:1},{n:"Salt Lake City",lat:40.7608,lng:-111.8910,z:11,m:1},
+ {n:"Denver",lat:39.7392,lng:-104.9903,z:11,m:1},{n:"Austin",lat:30.2672,lng:-97.7431,z:11,m:1},
+ {n:"Dallas",lat:32.7767,lng:-96.7970,z:11,m:1},{n:"Houston",lat:29.7604,lng:-95.3698,z:11,m:1},
+ {n:"Chicago",lat:41.8781,lng:-87.6298,z:11,m:1},{n:"Minneapolis",lat:44.9778,lng:-93.2650,z:11,m:1},
+ {n:"Detroit",lat:42.3314,lng:-83.0458,z:11,m:1},{n:"Nashville",lat:36.1627,lng:-86.7816,z:11,m:1},
+ {n:"New Orleans",lat:29.9511,lng:-90.0715,z:11,m:1},{n:"Atlanta",lat:33.7490,lng:-84.3880,z:11,m:1},
+ {n:"Miami",lat:25.7617,lng:-80.1918,z:11,m:1},{n:"Washington, DC",lat:38.9072,lng:-77.0369,z:11,m:1},
+ {n:"Philadelphia",lat:39.9526,lng:-75.1652,z:11,m:1},{n:"Boston",lat:42.3601,lng:-71.0589,z:11,m:1},
+ {n:"Toronto",lat:43.6532,lng:-79.3832,z:11,m:1},{n:"Ottawa",lat:45.4215,lng:-75.6972,z:11,m:1},
+ {n:"Montréal",lat:45.5019,lng:-73.5674,z:11,m:1},{n:"Calgary",lat:51.0447,lng:-114.0719,z:11,m:1},
+ {n:"Edmonton",lat:53.5461,lng:-113.4938,z:11,m:1},{n:"Mexico City",lat:19.4326,lng:-99.1332,z:11,m:1},
+ {n:"Guadalajara",lat:20.6597,lng:-103.3496,z:11,m:1},{n:"Monterrey",lat:25.6866,lng:-100.3161,z:11,m:1},
+];
+const nearestMetro=(lat,lng)=>PLACES.filter(p=>p.m).reduce((b,p)=>KM(lat,lng,p.lat,p.lng)<KM(lat,lng,b.lat,b.lng)?p:b);
+function setHome(name,lat,lng){
+  state.home={name,lat,lng};
+  const hn=$("#homeName"); if(hn) hn.textContent=name;
+}
+const sWrap=$("#searchWrap"), sInput=$("#searchInput"), sugg=$("#sugg");
+$("#searchBtn").addEventListener("click",()=>{
+  const open=sWrap.classList.toggle("open");
+  if(open) sInput.focus();
+  else { sugg.classList.remove("show"); sInput.value=""; }
+});
+function goPlace(p){
+  sWrap.classList.remove("open"); sugg.classList.remove("show"); sInput.value="";
+  setHome(p.n,p.lat,p.lng);
+  userMoved=false;
+  map.flyTo([p.lat,p.lng],p.z,{duration:.8});
+  setTimeout(()=>{
+    state.bounds=map.getBounds();
+    $("#areaChip").style.display="inline-block";
+    $("#searchArea").classList.remove("show");
+    userMoved=false; render();
+  },900);
+  toast("Showing "+p.n);
+}
+sInput.addEventListener("input",()=>{
+  const q=sInput.value.trim().toLowerCase();
+  if(q.length<2){ sugg.classList.remove("show"); return; }
+  const pl=PLACES.filter(p=>p.n.toLowerCase().includes(q)).slice(0,5);
+  const evs=EVENTS.filter(ev=>ev.t.toLowerCase().includes(q)||ev.v.toLowerCase().includes(q)).slice(0,4);
+  if(!pl.length&&!evs.length){ sugg.innerHTML='<div class="st">No matches — try a nearby city</div>'; sugg.classList.add("show"); return; }
+  sugg.innerHTML=(pl.length?'<div class="st">Places</div>'+pl.map((p,i)=>`<button data-pl="${i}">📍 ${p.n}</button>`).join(""):"")
+    +(evs.length?'<div class="st">Events</div>'+evs.map(ev=>`<button data-ev="${ev._id}">${CATS[ev.cat].e} ${esc(ev.t)}</button>`).join(""):"");
+  sugg.classList.add("show");
+  sugg.querySelectorAll("[data-pl]").forEach(b=>b.onclick=()=>goPlace(pl[+b.dataset.pl]));
+  sugg.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{
+    const ev=EVENTS.find(x=>x._id===b.dataset.ev);
+    sWrap.classList.remove("open"); sugg.classList.remove("show"); sInput.value="";
+    if(ev) openDetail(ev);
+  });
+});
+sInput.addEventListener("keydown",e=>{ if(e.key==="Escape"){ sWrap.classList.remove("open"); sugg.classList.remove("show"); } });
+
+/* ============ near me ============ */
+let youMarker=null;
+function setYou(lat,lng){
+  const met=nearestMetro(lat,lng);
+  setHome(met.n,met.lat,met.lng);
+  if(youMarker) youMarker.setLatLng([lat,lng]);
+  else youMarker=L.marker([lat,lng],{icon:L.divIcon({className:"",html:'<div class="youdot"></div>',iconSize:[16,16],iconAnchor:[8,8]}),interactive:false,zIndexOffset:1000}).addTo(map);
+  userMoved=false;
+  map.flyTo([lat,lng],12,{duration:.7});
+  setTimeout(()=>{userMoved=false;$("#searchArea").classList.remove("show")},800);
+  render();
+}
+function locateOnce(silent){
+  const fallback=()=>{ setYou(47.6062,-122.3321); if(!silent) toast("Couldn't get your location — using downtown Seattle for the demo."); };
+  if(!navigator.geolocation){ fallback(); return; }
+  navigator.geolocation.getCurrentPosition(
+    p=>{ setYou(p.coords.latitude,p.coords.longitude); state.sort="near"; $("#sortSel").value="near"; render(); if(!silent) toast("Centered on you 📍"); },
+    fallback, {timeout:4000,maximumAge:60000});
+}
+$("#nearBtn").addEventListener("click",()=>locateOnce(false));
+
+/* ============ marker style toggle ============ */
+function setMarkerMode(m){
+  state.markerMode=m;
+  $("#segLabels").setAttribute("aria-pressed",String(m==="labels"));
+  $("#segIcons").setAttribute("aria-pressed",String(m==="icons"));
+  markers.forEach(mk=>mk.setIcon(makeIcon(mk._ev)));
+}
+$("#segLabels").addEventListener("click",()=>setMarkerMode("labels"));
+$("#segIcons").addEventListener("click",()=>setMarkerMode("icons"));
+
+/* ============ theme ============ */
+$("#themeToggle").addEventListener("click",()=>{
+  const light=document.body.classList.toggle("light");
+  $("#themeToggle").textContent=light?"🌙":"☀️";
+  $('meta[name="theme-color"]').setAttribute("content",light?"#f4f5f8":"#0b0e14");
+  if(light){map.removeLayer(darkTiles);lightTiles.addTo(map);}
+  else{map.removeLayer(lightTiles);darkTiles.addTo(map);}
+});
+
+/* ============ filtering & sort ============ */
+function visible(){
+  const s = state.day||state.range.s, e = state.day||state.range.e;
+  const pass = ev => overlap(ev,s,e) && state.cats.has(ev.cat)
+    && (!state.freeOnly||ev.free);
+  const scope = ev => state.bounds ? state.bounds.contains([ev.lat,ev.lng]) : bandOf(ev)<=state.drive;
+  return {base:EVENTS.filter(ev=>pass(ev)&&scope(ev)), mine:state.userEvents.filter(pass)};
+}
+function sortEvents(arr){
+  const ctr = map.getCenter();
+  const dist = ev=>Math.hypot(ev.lat-ctr.lat,ev.lng-ctr.lng);
+  if(state.sort==="saves") return arr.sort((a,b)=>(b.sv||0)-(a.sv||0));
+  if(state.sort==="near")  return arr.sort((a,b)=>dist(a)-dist(b));
+  return arr.sort((a,b)=>a.s.localeCompare(b.s));
+}
+
+/* ============ render ============ */
+function render(){
+  markers.forEach(m=>map.removeLayer(m)); markers=[];
+  const {base,mine} = visible();
+  const shown = [...base,...mine.filter(m=>m.status==="private")];
+  shown.forEach(ev=>{
+    const m = L.marker([ev.lat,ev.lng],{icon:makeIcon(ev)}).addTo(map);
+    m._ev=ev; m.on("click",()=>openDetail(ev));
+    markers.push(m);
+  });
+  const cards = $("#cards"); cards.innerHTML="";
+  const pend = mine.filter(m=>m.status==="pending");
+  if(pend.length){
+    const note=document.createElement("div");note.className="pending-note";
+    note.textContent=`${pend.length} of your submitted event${pend.length>1?'s':''} awaiting moderator approval — not yet public.`;
+    cards.appendChild(note);
+  }
+  const all=sortEvents([...shown]);
+  $("#count").textContent = all.length;
+  if(!all.length){
+    cards.insertAdjacentHTML("beforeend",`<div class="empty"><div class="e-ico">🧭</div>Nothing matches right now.<div class="e-row"><button class="chip" id="emptyWiden">Show 3 weeks</button><button class="chip" id="emptyReset">Reset filters</button></div></div>`);
+    $("#emptyWiden").onclick=()=>{
+      $$("[data-range]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.range==="extended")));
+      state.rangeKey="extended"; state.range=RANGES.extended; state.day=null; render();
+    };
+    $("#emptyReset").onclick=resetFilters;
+  }
+  all.forEach(ev=>{
+    const c=CATS[ev.cat];
+    const el=document.createElement("div");
+    el.className="card"+(state.activeId===ev._id?" active":"");
+    el.tabIndex=0;
+    el.innerHTML=`
+      <div class="cicon" style="${grad(ev.cat)}">${c.e}</div>
+      <div class="cbody">
+        <h3>${esc(ev.t)}${ev.ver?'<span class="vv" title="Verified from official source">✓</span>':""}</h3>
+        <div class="cmeta">${fmt(ev.s)}${ev.e!==ev.s?"–"+fmt(ev.e):""} · ${esc(ev.v)}</div>
+      </div>
+      <div class="cside">
+        ${ev.status==="pending"?'<span class="pill pending">Pending</span>':ev.status==="private"?'<span class="pill private">Private</span>':`<span class="pill ${ev.free?"free":"paid"}">${ev.free?"FREE":"$"}</span>`}
+        <span class="mini">
+          <button class="${saved.has(ev._id)?"saved":""}" data-save="${ev._id}" title="Save">♥ ${(ev.sv||0)+(saved.has(ev._id)?1:0)}</button>
+          <button data-share="${ev._id}" title="Share">🔗</button>
+        </span>
+      </div>`;
+    el.addEventListener("click",e=>{
+      const sv=e.target.closest("[data-save]");
+      if(sv){ const id=sv.dataset.save; saved.has(id)?saved.delete(id):saved.add(id); render(); return; }
+      const sh=e.target.closest("[data-share]");
+      if(sh){ shareEvent(sh.dataset.share); return; }
+      if(ev.status!=="pending") openDetail(ev);
+    });
+    el.addEventListener("keydown",e=>{if(e.key==="Enter")el.click()});
+    cards.appendChild(el);
+  });
+  renderRail();
+  buildDaystrip();
+  updateBadge();
+}
+function renderRail(){
+  const rail=$("#rail");
+  const picks=EVENTS.filter(ev=>ev.pick&&overlap(ev,state.range.s,state.range.e)&&bandOf(ev)<=state.drive&&(!state.freeOnly||ev.free));
+  $("#railWrap").style.display=picks.length?"block":"none";
+  rail.innerHTML="";
+  picks.forEach(ev=>{
+    const c=CATS[ev.cat];
+    const d=document.createElement("div");d.className="pick";
+    d.innerHTML=`<div class="thumb" style="${grad(ev.cat)}">${c.e}</div>
+      <div class="pt"><b>${esc(ev.t)}</b><span>${fmt(ev.s)} · ${ev.free?"Free":"Ticketed"}</span></div>`;
+    d.onclick=()=>openDetail(ev);
+    rail.appendChild(d);
+  });
+}
+
+/* ============ spin the needle ============ */
+let spinDeg=0;
+$("#spinBtn").addEventListener("click",()=>{
+  const {base,mine}=visible();
+  const pool=[...base,...mine.filter(m=>m.status==="private")];
+  if(!pool.length){toast("Nothing to spin for — widen your filters first.");return;}
+  spinDeg+=720+Math.floor(Math.random()*360);
+  $("#spinBtn .nd").style.transform=`rotate(${spinDeg}deg)`;
+  const ev=pool[Math.floor(Math.random()*pool.length)];
+  setTimeout(()=>{ openDetail(ev); toast(`The needle says: ${ev.t} ✨`); },650);
+});
+
+/* ============ detail sheet ============ */
+function openDetail(ev){
+  state.activeId=ev._id;
+  const c=CATS[ev.cat];
+  const gmaps=`https://www.google.com/maps/dir/?api=1&destination=${ev.lat},${ev.lng}`;
+  const safeUrl = ev.url && /^https?:\/\//.test(ev.url) ? ev.url : null;
+  $("#detailPane").innerHTML=`
+    <div class="d-hero" style="${grad(ev.cat)}">${c.e}
+      <button class="d-close" id="dClose" aria-label="Close">✕</button></div>
+    <div class="d-body">
+      <h2>${esc(ev.t)}</h2>
+      <div class="d-sub">${c.label} · ${DRIVE_LABEL[Math.min(bandOf(ev),3)]} drive from ${esc(state.home.name)}</div>
+      <div class="d-badges">
+        ${ev.free?'<span class="pill free">FREE</span>':'<span class="pill paid">Ticketed · price on official site</span>'}
+        ${ev.ver?'<span class="pill ver">✓ Verified from official source</span>':'<span class="pill pending">Unverified — check official site</span>'}
+      </div>
+      <p class="d-summary">${esc(ev.sum||"")}</p>
+      <div class="d-facts">
+        <div class="d-fact"><span class="fl">When</span><span>${fmt(ev.s)}${ev.e!==ev.s?" – "+fmt(ev.e):""}, 2026</span></div>
+        <div class="d-fact"><span class="fl">Where</span><span>${esc(ev.v)}</span></div>
+        <div class="d-fact"><span class="fl">Saved by</span><span>♥ ${(ev.sv||0)+(saved.has(ev._id)?1:0)} people</span></div>
+      </div>
+      <div class="d-actions">
+        ${safeUrl?`<a class="d-btn primary" href="${safeUrl}" target="_blank" rel="noopener">Official site — details & tickets ↗</a>`:""}
+        <button class="d-btn plan" id="dPlan">🗳 Plan it with the group chat</button>
+        <a class="d-btn" href="${gmaps}" target="_blank" rel="noopener">🧭 Directions</a>
+        <button class="d-btn" id="dCal">📅 Calendar</button>
+        <button class="d-btn ${saved.has(ev._id)?"saved":""}" id="dSave">♥ ${saved.has(ev._id)?"Saved":"Save"}</button>
+        <button class="d-btn" id="dShare">🔗 Copy link</button>
+      </div>
+    </div>`;
+  $("#detailOv").classList.add("open");
+  $("#dClose").onclick=closeDetail;
+  $("#detailOv").onclick=e=>{if(e.target.id==="detailOv")closeDetail()};
+  $("#dShare").onclick=()=>shareEvent(ev._id);
+  $("#dSave").onclick=()=>{saved.has(ev._id)?saved.delete(ev._id):saved.add(ev._id);openDetail(ev);render();};
+  $("#dCal").onclick=()=>downloadIcs(ev);
+  $("#dPlan").onclick=()=>{
+    const link=location.href.split("#")[0]+"#e="+ev._id;
+    const msg=`${ev.t} — ${fmt(ev.s)}${ev.e!==ev.s?"–"+fmt(ev.e):""} at ${ev.v}. Who's in? ${link}`;
+    (navigator.clipboard?.writeText(msg)||Promise.reject()).then(()=>toast("Group-chat message copied — paste and see who's in."))
+      .catch(()=>toast(msg));
+  };
+  map.flyTo([ev.lat,ev.lng],Math.max(map.getZoom(),11),{duration:.5});
+}
+function closeDetail(){$("#detailOv").classList.remove("open")}
+function downloadIcs(ev){
+  const d1=ev.s.replace(/-/g,""), end=new Date(ev.e+"T00:00:00");end.setDate(end.getDate()+1);
+  const d2=end.toISOString().slice(0,10).replace(/-/g,"");
+  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Whim//EN","BEGIN:VEVENT",
+    "UID:"+ev._id+"@whim.app","DTSTAMP:20260715T000000Z",
+    "DTSTART;VALUE=DATE:"+d1,"DTEND;VALUE=DATE:"+d2,
+    "SUMMARY:"+ev.t.replace(/,/g,"\\,"),"LOCATION:"+ev.v.replace(/,/g,"\\,"),
+    "DESCRIPTION:"+(ev.sum||"").replace(/,/g,"\\,")+(ev.url&&ev.url!=="#"?" — "+ev.url:""),
+    "END:VEVENT","END:VCALENDAR"].join("\r\n");
+  const a=document.createElement("a");
+  a.href="data:text/calendar;charset=utf-8,"+encodeURIComponent(ics);
+  a.download=ev._id+".ics";document.body.appendChild(a);a.click();a.remove();
+  toast("Calendar file downloaded 📅");
+}
+
+/* ============ day strip ============ */
+function buildDaystrip(){
+  const strip=$("#daystrip"); strip.innerHTML="";
+  const {s,e}= state.rangeKey==="extended"?{s:"2026-07-15",e:"2026-08-05"}:state.range;
+  const start=new Date(s+"T00:00:00"), end=new Date(e+"T00:00:00");
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+    const iso=d.toISOString().slice(0,10);
+    const evs=EVENTS.filter(ev=>overlap(ev,iso,iso)&&bandOf(ev)<=state.drive&&state.cats.has(ev.cat)&&(!state.freeOnly||ev.free));
+    const btn=document.createElement("button");
+    btn.className="day"+(state.day===iso?" sel":"")+(iso==="2026-07-15"?" today":"")+(evs.length===0?" dim":"");
+    btn.innerHTML=`<small>${d.toLocaleDateString("en-US",{weekday:"short"})}</small><b>${d.getDate()}</b>
+      <span class="dots">${evs.slice(0,5).map(ev=>`<i style="background:${CATS[ev.cat].raw}"></i>`).join("")}</span>`;
+    btn.title=`${evs.length} event${evs.length!==1?"s":""}`;
+    btn.addEventListener("click",()=>{ state.day = state.day===iso?null:iso; render(); });
+    strip.appendChild(btn);
+  }
+}
+
+/* ============ controls ============ */
+const RANGES={
+  today:{s:"2026-07-15",e:"2026-07-15"},
+  weekend:{s:"2026-07-17",e:"2026-07-19"},
+  week:{s:"2026-07-15",e:"2026-07-22"},
+  extended:{s:"2026-07-15",e:"2026-08-05"},
+};
+$$("[data-range]").forEach(b=>b.addEventListener("click",()=>{
+  $$("[data-range]").forEach(x=>x.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed","true");
+  state.rangeKey=b.dataset.range; state.range=RANGES[b.dataset.range]; state.day=null; render();
+}));
+$$("[data-drive]").forEach(b=>b.addEventListener("click",()=>{
+  $$("[data-drive]").forEach(x=>x.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed","true");
+  state.drive=+b.dataset.drive; render();
+  userMoved=false;
+  const z=[11,10,9,8][state.drive]; map.flyTo([state.home.lat,state.home.lng],z,{duration:.6});
+  setTimeout(()=>{userMoved=false;$("#searchArea").classList.remove("show")},700);
+}));
+$("#freeChip").addEventListener("click",()=>{
+  state.freeOnly=!state.freeOnly;
+  $("#freeChip").setAttribute("aria-pressed",String(state.freeOnly));
+  render();
+});
+$("#sortSel").addEventListener("change",e=>{state.sort=e.target.value;render()});
+const catGrid=$("#catGrid");
+Object.entries(CATS).forEach(([k,c])=>{
+  const b=document.createElement("button");
+  b.className="cat-tile"; b.setAttribute("aria-pressed","true"); b.dataset.cat=k;
+  b.innerHTML=`<span class="ce">${c.e}</span>${c.label}`;
+  b.addEventListener("click",()=>{
+    const on=b.getAttribute("aria-pressed")==="true";
+    b.setAttribute("aria-pressed",String(!on));
+    on?state.cats.delete(k):state.cats.add(k); render();
+  });
+  catGrid.appendChild(b);
+});
+$("#openFilters").addEventListener("click",()=>$("#filterOverlay").classList.add("open"));
+$("#closeFilters").addEventListener("click",()=>$("#filterOverlay").classList.remove("open"));
+$("#filterOverlay").addEventListener("click",e=>{if(e.target.id==="filterOverlay")$("#filterOverlay").classList.remove("open")});
+$("#catAll").addEventListener("click",()=>{
+  state.cats=new Set(Object.keys(CATS));
+  $$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed","true")); render();
+});
+$("#catNone").addEventListener("click",()=>{
+  state.cats=new Set();
+  $$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed","false")); render();
+});
+function updateBadge(){
+  const n=(state.freeOnly?1:0)+(state.drive<3?1:0)+(Object.keys(CATS).length-state.cats.size>0?1:0);
+  const b=$("#fBadge"); b.hidden=!n; b.textContent=n;
+}
+function resetFilters(){
+  state.freeOnly=false; $("#freeChip").setAttribute("aria-pressed","false");
+  state.cats=new Set(Object.keys(CATS));
+  $$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed","true"));
+  state.drive=3;
+  $$("[data-drive]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.drive==="3")));
+  state.bounds=null; $("#areaChip").style.display="none"; state.day=null;
+  render();
+}
+
+/* ============ submit flow ============ */
+const catSel=$("#fCat");
+Object.entries(CATS).forEach(([k,c])=>catSel.insertAdjacentHTML("beforeend",`<option value="${k}">${c.e} ${c.label}</option>`));
+let vis="public";
+$("#visRow").addEventListener("click",e=>{
+  const o=e.target.closest(".vis-opt"); if(!o)return;
+  $$(".vis-opt").forEach(x=>x.classList.remove("sel")); o.classList.add("sel"); vis=o.dataset.vis;
+});
+$("#openSubmit").addEventListener("click",()=>$("#overlay").classList.add("open"));
+$("#cancelSubmit").addEventListener("click",()=>$("#overlay").classList.remove("open"));
+$("#overlay").addEventListener("click",e=>{if(e.target.id==="overlay")$("#overlay").classList.remove("open")});
+let placing=null;
+$("#saveSubmit").addEventListener("click",()=>{
+  const name=$("#fName").value.trim(); if(!name){$("#fName").focus();return;}
+  let url=$("#fUrl").value.trim();
+  if(url && !/^https?:\/\//i.test(url)) url="https://"+url;
+  if(url && !/^https?:\/\/[\w.-]+/i.test(url)) url="";
+  const ev={t:name,s:$("#fStart").value||"2026-07-16",e:$("#fEnd").value||$("#fStart").value||"2026-07-16",
+    v:$("#fPlace").value.trim()||"To be placed on map",cat:catSel.value,d:0,
+    url:url||"#",free:false,ver:false,sv:0,
+    sum: vis==="private"?"Your private event.":"Community submission — awaiting moderator approval.",
+    status:vis==="private"?"private":"pending",
+    lat:47.6062,lng:-122.3321,_id:"u"+Date.now()};
+  if(ev.e<ev.s) ev.e=ev.s;
+  state.userEvents.push(ev);
+  $("#overlay").classList.remove("open");
+  ["fName","fPlace","fUrl"].forEach(id=>$("#"+id).value="");
+  if(vis==="private"){ placing=ev; toast("Private pin added — click the map to place it exactly."); }
+  else toast("Submitted! A moderator will review it before it goes public.");
+  render();
+});
+map.on("click",e=>{
+  if(placing){ placing.lat=e.latlng.lat; placing.lng=e.latlng.lng;
+    const p=placing; placing=null; render(); toast("Pin placed."); openDetail(p); }
+});
+
+/* ============ keyboard ============ */
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  closeDetail();
+  $$(".overlay").forEach(o=>o.classList.remove("open"));
+});
+
+/* ============ shareable links ============ */
+window.shareEvent = id=>{
+  const url = location.href.split("#")[0] + "#e=" + id;
+  const done = ()=>toast("Link copied — send it to the group chat.");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(done).catch(()=>toast(url));
+  } else toast(url);
+};
+function openFromHash(){
+  const m = location.hash.match(/e=([\w-]+)/); if(!m) return;
+  const ev = [...EVENTS,...state.userEvents].find(x=>x._id===m[1]); if(!ev) return;
+  state.rangeKey="extended"; state.range=RANGES.extended; state.day=null; state.drive=3;
+  state.cats=new Set(Object.keys(CATS)); state.freeOnly=false; state.bounds=null; state.activeId=ev._id;
+  $$("[data-range]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.range==="extended")));
+  $$("[data-drive]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.drive==="3")));
+  $$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed","true"));
+  render(); openDetail(ev); toast("Opened from a shared link");
+}
+window.addEventListener("hashchange",openFromHash);
+
+/* ============ weekly digest ============ */
+const DIGEST_LABEL = ["in Seattle","within a 1-hour drive","within a 2-hour drive","within a 3-hour drive"];
+$("#openDigest").addEventListener("click",()=>{
+  const wknd = {s:"2026-07-17",e:"2026-07-19"};
+  const pool = EVENTS.filter(ev=>overlap(ev,wknd.s,wknd.e)&&bandOf(ev)<=state.drive&&state.cats.has(ev.cat)&&(!state.freeOnly||ev.free));
+  const free = pool.filter(ev=>ev.free).length;
+  const dl = state.drive===0 ? `in ${state.home.name}` : DIGEST_LABEL[state.drive]+` of ${state.home.name}`;
+  $("#dSubj").textContent = `Your weekend, on a whim: ${pool.length} picks ${dl} — ${free} free`;
+  const days = [["Friday, Jul 17","2026-07-17"],["Saturday, Jul 18","2026-07-18"],["Sunday, Jul 19","2026-07-19"]];
+  $("#dBody").innerHTML = days.map(([label,iso])=>{
+    const evs = pool.filter(ev=>overlap(ev,iso,iso)).sort((a,b)=>(b.sv||0)-(a.sv||0)).slice(0,4);
+    if(!evs.length) return "";
+    return `<h4>${label}</h4>` + evs.map(ev=>`
+      <div class="d-item"><span class="de">${CATS[ev.cat].e}</span>
+        <div><b>${esc(ev.t)}</b><span class="dm">${esc(ev.v)} · ♥ ${ev.sv} saved${ev.free?" · Free":""}</span>
+        <a href="#" onclick="shareEvent('${ev._id}');return false">Copy link</a></div></div>`).join("");
+  }).join("");
+  $("#digestOverlay").classList.add("open");
+});
+$("#closeDigest").addEventListener("click",()=>$("#digestOverlay").classList.remove("open"));
+$("#digestOverlay").addEventListener("click",e=>{if(e.target.id==="digestOverlay")$("#digestOverlay").classList.remove("open")});
+
+/* ============ smart app banner ============ */
+$("#abX").addEventListener("click",()=>{ $("#appBanner").remove(); document.body.classList.remove("hasbanner"); });
+$("#abOpen").addEventListener("click",()=>{
+  const t=Date.now();
+  location.href="whim://open"+location.hash;   /* custom URL scheme the native app registers */
+  setTimeout(()=>{
+    if(Date.now()-t<1600) toast("App not installed yet — in production this falls back to the App Store / Play Store listing.");
+  },1200);
+});
+
+/* ============ mobile sheet ============ */
+$("#sheetToggle").addEventListener("click",()=>$("#panel").classList.toggle("closed"));
+if(window.innerWidth<=760) $("#panel").classList.add("closed");
+
+render();
+openFromHash();
+if(!location.hash.includes("e=")) locateOnce();
+</script>
+</body>
+</html>
