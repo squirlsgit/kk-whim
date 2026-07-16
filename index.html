@@ -131,6 +131,18 @@
   .mini button.saved{color:#ff6b81}
   .empty{padding:34px 22px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.6}
   .pending-note{padding:9px 13px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:14px;font-size:12px;color:var(--gold);margin:2px 0 6px}
+  .grp{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#b9a7f5;margin:10px 2px 0;text-transform:uppercase}
+  body.light .grp{color:#7c5ce8}
+  .dchip{width:42px;flex-shrink:0;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--line);text-align:center;padding:5px 0}
+  body.light .dchip{background:#eef0f5}
+  .dchip span{display:block;font-size:9px;font-weight:700;letter-spacing:.08em;color:#b9a7f5}
+  body.light .dchip span{color:#7c5ce8}
+  .dchip b{display:block;font-size:15px;font-weight:800}
+  .hero{border-radius:16px;padding:14px 15px;margin:6px 0 4px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2));transition:transform .12s}
+  .hero:hover{transform:translateY(-1px)}
+  .hero .hl{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.85}
+  .hero b{display:block;font-size:16px;letter-spacing:-.01em;margin:3px 0 2px;line-height:1.25}
+  .hero .hm{font-size:11.5px;opacity:.88}
 
   /* ---------- map ---------- */
   #mapwrap{position:relative;padding:0 12px 12px 6px}
@@ -168,10 +180,14 @@
   .filter-fab{position:absolute;top:16px;right:16px;z-index:950;width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);color:var(--text);font-size:15px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3)}
   .filter-fab .fbadge{position:absolute;top:-6px;right:-6px;margin:0}
   .bottomnav{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:960;display:flex;align-items:center;gap:5px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:999px;padding:7px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
-  .bn-btn{width:44px;height:44px;border-radius:50%;border:none;background:none;color:var(--text);font-size:17px;cursor:pointer;display:grid;place-items:center}
-  .bn-btn:hover{background:var(--surface)}
-  .bn-main{width:54px;height:54px;border-radius:50%;border:none;background:var(--grad);color:#fff;font-size:21px;cursor:pointer;box-shadow:0 6px 18px rgba(139,92,246,.45);display:grid;place-items:center;margin:0 3px}
-  .bn-main:active{transform:scale(.94)}
+  .bn-btn{width:58px;border:none;background:none;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:12px}
+  .bn-btn svg{width:20px;height:20px}
+  .bn-btn:hover{color:var(--text)}
+  .bn-main{width:64px;border:none;background:none;color:#b9a7f5;font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0}
+  body.light .bn-main{color:#7c5ce8}
+  .bn-main .disc{width:44px;height:44px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;box-shadow:0 6px 18px rgba(139,92,246,.45)}
+  .bn-main .disc svg{width:21px;height:21px}
+  .bn-main:active .disc{transform:scale(.94)}
   .nd{display:inline-block;transition:transform .7s cubic-bezier(.2,.8,.3,1)}
   .segwide{width:100%;height:42px;margin:0 0 4px}
   .segwide button{flex:1}
@@ -337,11 +353,22 @@
     </div>
     <button class="filter-fab" id="openFilters" aria-label="Filters">☰<span class="fbadge" id="fBadge" hidden>0</span></button>
     <nav class="bottomnav" aria-label="Quick actions">
-      <button class="bn-btn" id="openLib" aria-label="My saved folders and submissions" title="My stuff">👤</button>
-      <button class="bn-btn" id="openDigest" aria-label="Weekend digest" title="Weekend digest">📬</button>
-      <button class="bn-main" id="nearBtn" aria-label="Near me" title="Near me">📍</button>
-      <button class="bn-btn" id="themeToggle" aria-label="Toggle light or dark mode" title="Theme">☀️</button>
-      <button class="bn-btn" id="openSubmit" aria-label="Add an event" title="Add an event">＋</button>
+      <button class="bn-btn" id="openLib" aria-label="My saved folders and submissions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Saved</button>
+      <button class="bn-btn" id="openDigest" aria-label="Weekend digest">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+        Digest</button>
+      <button class="bn-main" id="nearBtn" aria-label="Near me">
+        <span class="disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span>
+        Near me</button>
+      <button class="bn-btn" id="themeToggle" aria-label="Toggle light or dark mode">
+        <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        Theme</button>
+      <button class="bn-btn" id="openSubmit" aria-label="Add an event">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Add</button>
     </nav>
     <button class="searcharea" id="searchArea">Search this area</button>
   </div>
@@ -368,6 +395,12 @@
     <div class="seg segwide" role="group" aria-label="Marker style">
       <button id="segIcons" aria-pressed="true">● Icons</button>
       <button id="segLabels" aria-pressed="false">🏷 Labels</button>
+    </div>
+    <div class="fsec">List layout</div>
+    <div class="seg segwide" role="group" aria-label="List layout">
+      <button data-lmode="day" aria-pressed="true">By day</button>
+      <button data-lmode="chip" aria-pressed="false">Date chips</button>
+      <button data-lmode="hero" aria-pressed="false">Hero</button>
     </div>
     <div class="fsec">How far will you go?</div>
     <div class="drive-row">
@@ -566,7 +599,7 @@ const saved = new Set();
 const state = {
   range:{s:"2026-07-15",e:"2026-07-22"}, rangeKey:"week", day:null,
   drive:3, cats:new Set(Object.keys(CATS)), freeOnly:false,
-  sort:"date", bounds:null, userEvents:[], activeId:null, markerMode:"icons",
+  sort:"date", bounds:null, userEvents:[], activeId:null, markerMode:"icons", listMode:"day",
   home:{name:"Seattle",lat:47.6062,lng:-122.3321},
 };
 const KM=(a,b,c,d)=>{const R=6371,r=Math.PI/180,dLa=(c-a)*r,dLo=(d-b)*r,x=Math.sin(dLa/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(x));};
@@ -635,6 +668,30 @@ const PLACES=[
  {n:"Montréal",lat:45.5019,lng:-73.5674,z:11,m:1},{n:"Calgary",lat:51.0447,lng:-114.0719,z:11,m:1},
  {n:"Edmonton",lat:53.5461,lng:-113.4938,z:11,m:1},{n:"Mexico City",lat:19.4326,lng:-99.1332,z:11,m:1},
  {n:"Guadalajara",lat:20.6597,lng:-103.3496,z:11,m:1},{n:"Monterrey",lat:25.6866,lng:-100.3161,z:11,m:1},
+ {n:"San Jose",lat:37.3382,lng:-121.8863,z:11,m:1},{n:"Sacramento",lat:38.5816,lng:-121.4944,z:11,m:1},
+ {n:"Reno",lat:39.5296,lng:-119.8138,z:11,m:1},{n:"Boise",lat:43.6150,lng:-116.2023,z:11,m:1},
+ {n:"Tucson",lat:32.2226,lng:-110.9747,z:11,m:1},{n:"Albuquerque",lat:35.0844,lng:-106.6504,z:11,m:1},
+ {n:"El Paso",lat:31.7619,lng:-106.4850,z:11,m:1},{n:"San Antonio",lat:29.4241,lng:-98.4936,z:11,m:1},
+ {n:"Oklahoma City",lat:35.4676,lng:-97.5164,z:11,m:1},{n:"Tulsa",lat:36.1540,lng:-95.9928,z:11,m:1},
+ {n:"Kansas City",lat:39.0997,lng:-94.5786,z:11,m:1},{n:"St. Louis",lat:38.6270,lng:-90.1994,z:11,m:1},
+ {n:"Omaha",lat:41.2565,lng:-95.9345,z:11,m:1},{n:"Des Moines",lat:41.5868,lng:-93.6250,z:11,m:1},
+ {n:"Milwaukee",lat:43.0389,lng:-87.9065,z:11,m:1},{n:"Madison",lat:43.0731,lng:-89.4012,z:11,m:1},
+ {n:"Indianapolis",lat:39.7684,lng:-86.1581,z:11,m:1},{n:"Columbus",lat:39.9612,lng:-82.9988,z:11,m:1},
+ {n:"Cincinnati",lat:39.1031,lng:-84.5120,z:11,m:1},{n:"Cleveland",lat:41.4993,lng:-81.6944,z:11,m:1},
+ {n:"Pittsburgh",lat:40.4406,lng:-79.9959,z:11,m:1},{n:"Buffalo",lat:42.8864,lng:-78.8784,z:11,m:1},
+ {n:"Baltimore",lat:39.2904,lng:-76.6122,z:11,m:1},{n:"Richmond",lat:37.5407,lng:-77.4360,z:11,m:1},
+ {n:"Raleigh",lat:35.7796,lng:-78.6382,z:11,m:1},{n:"Charlotte",lat:35.2271,lng:-80.8431,z:11,m:1},
+ {n:"Charleston, SC",lat:32.7765,lng:-79.9311,z:11,m:1},{n:"Savannah",lat:32.0809,lng:-81.0912,z:11,m:1},
+ {n:"Jacksonville",lat:30.3322,lng:-81.6557,z:11,m:1},{n:"Orlando",lat:28.5383,lng:-81.3792,z:11,m:1},
+ {n:"Tampa",lat:27.9506,lng:-82.4572,z:11,m:1},{n:"Memphis",lat:35.1495,lng:-90.0490,z:11,m:1},
+ {n:"Louisville",lat:38.2527,lng:-85.7585,z:11,m:1},{n:"Birmingham",lat:33.5186,lng:-86.8104,z:11,m:1},
+ {n:"Providence",lat:41.8240,lng:-71.4128,z:11,m:1},{n:"Hartford",lat:41.7658,lng:-72.6734,z:11,m:1},
+ {n:"Albany",lat:42.6526,lng:-73.7562,z:11,m:1},{n:"Burlington, VT",lat:44.4759,lng:-73.2121,z:11,m:1},
+ {n:"Honolulu",lat:21.3069,lng:-157.8583,z:11,m:1},{n:"Anchorage",lat:61.2181,lng:-149.9003,z:11,m:1},
+ {n:"Victoria, BC",lat:48.4284,lng:-123.3656,z:11,m:1},{n:"Winnipeg",lat:49.8951,lng:-97.1384,z:11,m:1},
+ {n:"Saskatoon",lat:52.1332,lng:-106.6700,z:11,m:1},{n:"Regina",lat:50.4452,lng:-104.6189,z:11,m:1},
+ {n:"Hamilton, ON",lat:43.2557,lng:-79.8711,z:11,m:1},{n:"London, ON",lat:42.9849,lng:-81.2453,z:11,m:1},
+ {n:"Québec City",lat:46.8139,lng:-71.2080,z:11,m:1},{n:"Halifax",lat:44.6488,lng:-63.5752,z:11,m:1},
 ];
 const nearestMetro=(lat,lng)=>PLACES.filter(p=>p.m).reduce((b,p)=>KM(lat,lng,p.lat,p.lng)<KM(lat,lng,b.lat,b.lng)?p:b);
 function setHome(name,lat,lng){
@@ -708,11 +765,17 @@ function setMarkerMode(m){
 }
 $("#segLabels").addEventListener("click",()=>setMarkerMode("labels"));
 $("#segIcons").addEventListener("click",()=>setMarkerMode("icons"));
+$$("[data-lmode]").forEach(b=>b.addEventListener("click",()=>{
+  state.listMode=b.dataset.lmode;
+  $$("[data-lmode]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  render();
+}));
 
 /* ============ theme ============ */
 $("#themeToggle").addEventListener("click",()=>{
   const light=document.body.classList.toggle("light");
-  $("#themeToggle").textContent=light?"🌙":"☀️";
+  $("#iconSun").style.display=light?"none":"block";
+  $("#iconMoon").style.display=light?"block":"none";
   $('meta[name="theme-color"]').setAttribute("content",light?"#f4f5f8":"#0b0e14");
   if(light){map.removeLayer(darkTiles);lightTiles.addTo(map);}
   else{map.removeLayer(lightTiles);darkTiles.addTo(map);}
@@ -761,15 +824,20 @@ function render(){
     };
     $("#emptyReset").onclick=resetFilters;
   }
-  all.forEach(ev=>{
+  const addCard=(ev,variant)=>{
     const c=CATS[ev.cat];
+    const eff=ev.s>"2026-07-15"?ev.s:"2026-07-15";
+    const ed=new Date(eff+"T00:00:00");
     const el=document.createElement("div");
     el.className="card"+(state.activeId===ev._id?" active":"");
     el.tabIndex=0;
+    const lead = variant==="chip"
+      ? `<div class="dchip"><span>${ed.toLocaleDateString("en-US",{weekday:"short"}).toUpperCase()}</span><b>${ed.getDate()}</b></div>`
+      : `<div class="cicon" style="${grad(ev.cat)}">${c.e}</div>`;
     el.innerHTML=`
-      <div class="cicon" style="${grad(ev.cat)}">${c.e}</div>
+      ${lead}
       <div class="cbody">
-        <h3>${esc(ev.t)}${ev.ver?'<span class="vv" title="Verified from official source">✓</span>':""}</h3>
+        <h3>${variant==="chip"?c.e+" ":""}${esc(ev.t)}${ev.ver?'<span class="vv" title="Verified from official source">✓</span>':""}</h3>
         <div class="cmeta">${fmt(ev.s)}${ev.e!==ev.s?"–"+fmt(ev.e):""} · ${esc(ev.v)}</div>
       </div>
       <div class="cside">
@@ -788,7 +856,38 @@ function render(){
     });
     el.addEventListener("keydown",e=>{if(e.key==="Enter")el.click()});
     cards.appendChild(el);
-  });
+  };
+  const layout = state.sort==="date" ? state.listMode : "flat";
+  if(layout==="day"){
+    const LBL=["Today · Wed, Jul 15","Tomorrow · Thu, Jul 16","This weekend · Jul 17–19","Next week","Later this month"];
+    const bucket=ev=>{
+      const eff=ev.s>"2026-07-15"?ev.s:"2026-07-15";
+      if(eff==="2026-07-15") return 0;
+      if(eff==="2026-07-16") return 1;
+      if(eff>="2026-07-17"&&eff<="2026-07-19") return 2;
+      if(eff<="2026-07-26") return 3;
+      return 4;
+    };
+    let last=-1;
+    all.forEach(ev=>{
+      const b=bucket(ev);
+      if(b!==last){ cards.insertAdjacentHTML("beforeend",`<div class="grp">${LBL[b]}</div>`); last=b; }
+      addCard(ev);
+    });
+  } else if(layout==="hero" && all.length){
+    const hero=[...all].sort((a,b)=>((b.pick?50:0)+(b.sv||0))-((a.pick?50:0)+(a.sv||0)))[0];
+    const hc=CATS[hero.cat];
+    cards.insertAdjacentHTML("beforeend",
+      `<div class="hero" style="${grad(hero.cat)}" tabindex="0"><span class="hl">✦ Pick of the day</span><b>${hc.e} ${esc(hero.t)}</b><span class="hm">${fmt(hero.s)}${hero.e!==hero.s?"–"+fmt(hero.e):""} · ${esc(hero.v)}${hero.free?" · Free":""}</span></div>`);
+    const hEl=cards.lastElementChild;
+    hEl.onclick=()=>openDetail(hero);
+    hEl.addEventListener("keydown",e=>{if(e.key==="Enter")openDetail(hero)});
+    all.filter(ev=>ev!==hero).forEach(ev=>addCard(ev));
+  } else if(layout==="chip"){
+    all.forEach(ev=>addCard(ev,"chip"));
+  } else {
+    all.forEach(ev=>addCard(ev));
+  }
   renderRail();
   buildDaystrip();
   updateBadge();
@@ -892,6 +991,7 @@ function openDetail(ev){
       </div>
       <div class="d-actions">
         ${safeUrl?`<a class="d-btn primary" href="${safeUrl}" target="_blank" rel="noopener">Official site — details & tickets ↗</a>`:""}
+        ${ev.tix&&/^https?:\/\//.test(ev.tix)&&ev.tix!==ev.url?`<a class="d-btn" href="${ev.tix}" target="_blank" rel="noopener" style="grid-column:1/-1">🎟 Tickets</a>`:""}
         <button class="d-btn plan" id="dPlan">🗳 Plan it with the group chat</button>
         <a class="d-btn" href="${gmaps}" target="_blank" rel="noopener">🧭 Directions</a>
         <button class="d-btn" id="dCal">📅 Calendar</button>
