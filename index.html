@@ -4,16 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0b0e14">
-<meta name="description" content="Whim — see what's happening around you tonight, this weekend, or within a 3-hour drive.">
+<meta name="description" content="Whim — see what's happening around you tonight, this weekend, or within day-trip distance.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Whim">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="manifest" href='data:application/manifest+json,{"name":"Whim","short_name":"Whim","start_url":".","display":"standalone","background_color":"%230b0e14","theme_color":"%230b0e14"}'>
-<title>Whim — your weekend, on a whim</title>
+<title>Whim — find your next good night</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL@20..48,400,0..1" rel="stylesheet">
 <style>
   :root{
     --bg:#0b0e14; --surface:#141824; --raise:#1b2130; --glass:rgba(20,24,36,.82);
@@ -175,8 +177,14 @@
   .seg button[aria-pressed="true"]{background:var(--grad);color:#fff}
   .youdot{width:16px;height:16px;border-radius:50%;background:#38bdf8;border:3px solid #fff;box-shadow:0 0 0 6px rgba(56,189,248,.28)}
   .cpin{position:relative;width:38px;height:38px;border-radius:50%;background:var(--raise);border:2.5px solid var(--c,#999);display:grid;place-items:center;font-size:16px;box-shadow:0 3px 10px rgba(0,0,0,.4);cursor:pointer}
+  .cpin .cat-symbol{color:var(--c,#999)!important}
   .cpin.private{border-style:dashed;border-color:#8b5cf6}
   .cpin i{position:absolute;top:-7px;right:-10px;font-style:normal;background:var(--grad);color:#fff;font-size:9px;font-weight:800;padding:2px 5px;border-radius:999px;border:1.5px solid var(--bg);line-height:1.2}
+  .venue-popup{display:grid;gap:6px;min-width:230px;color:#121827}
+  .venue-popup>b{font-size:13px;line-height:1.35;margin-bottom:2px}
+  .venue-popup button{display:grid;grid-template-columns:64px 1fr;gap:8px;align-items:start;width:100%;border:0;border-radius:9px;background:#f1f5f9;color:#172033;padding:8px;text-align:left;font:inherit;font-size:11.5px;line-height:1.35;cursor:pointer}
+  .venue-popup button:hover,.venue-popup button:focus-visible{background:#e2e8f0;outline:none}
+  .venue-popup button span{color:#64748b;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
   .filter-fab{position:absolute;top:16px;right:16px;z-index:950;width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);color:var(--text);font-size:15px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3)}
   .filter-fab .fbadge{position:absolute;top:-6px;right:-6px;margin:0}
   .bottomnav{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:960;display:flex;align-items:center;gap:5px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:999px;padding:7px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
@@ -286,6 +294,7 @@
   .appbanner .ab-t span{font-size:11px;color:var(--muted)}
   .ab-open{border:none;background:var(--grad);color:#fff;font-weight:700;font-size:12.5px;padding:8px 15px;border-radius:999px;cursor:pointer}
   .ab-x{border:none;background:none;color:var(--muted);font-size:14px;cursor:pointer;padding:4px}
+  .d-hero{height:220px}.d-body{padding-top:22px}.d-actions{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 14%);padding-top:18px}
   @media (max-width:760px){
     .appbanner{display:flex}
     body.hasbanner .map-ctl,body.hasbanner .filter-fab{top:calc(64px + env(safe-area-inset-top))}
@@ -293,6 +302,49 @@
 
   /* ---------- mobile ---------- */
   .sheet-toggle{display:none}
+
+  /* ---------- discover-first redesign ---------- */
+  #app{grid-template-columns:minmax(430px,520px) 1fr}
+  aside{padding:0 10px 0 16px}
+  .discover-top{position:sticky;top:0;z-index:8;background:linear-gradient(180deg,var(--bg) 82%,transparent);padding:15px 6px 12px}
+  .appbanner{display:none!important}
+  .discover-brand{display:flex;align-items:center;gap:10px;margin-bottom:15px}
+  .brand-mark{width:38px;height:38px;border-radius:13px;background:var(--grad);display:grid;place-items:center;color:white;font-weight:800;font-size:18px;box-shadow:0 8px 24px rgba(139,92,246,.28)}
+  .discover-brand .wordmark{flex:1}.discover-brand .wordmark b{font-size:19px;letter-spacing:-.04em}.discover-brand .wordmark span{display:block;color:var(--muted);font-size:10.5px;margin-top:1px}
+  .top-icon{width:44px;height:44px;border-radius:13px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:grid;place-items:center;cursor:pointer}
+  .material-symbols-rounded{font-size:21px;line-height:1;font-variation-settings:'FILL' 0,'wght' 420,'GRAD' 0,'opsz' 24}
+  .material-symbols-rounded.cat-symbol{font-size:19px;vertical-align:-4px;color:inherit}.cpin .cat-symbol{font-size:18px}.mpill .cat-symbol{font-size:15px;vertical-align:-3px}.ce .cat-symbol,.le .cat-symbol,.de .cat-symbol{font-size:19px}
+  button .material-symbols-rounded,a .material-symbols-rounded{vertical-align:middle}.rail-head b,.seg button,.lib-tabs button,.area-chip,.lchip,.cwhy,.pill,.d-btn{display:flex;align-items:center;justify-content:center;gap:5px}.rail-head b{justify-content:flex-start}.cwhy{justify-content:flex-start}.area-chip .material-symbols-rounded,.pill .material-symbols-rounded,.cwhy .material-symbols-rounded,.vv{font-size:15px}.lx{min-width:40px;min-height:40px;display:grid;place-items:center}.lx .material-symbols-rounded{font-size:19px}.d-fact>span:last-child{display:flex;align-items:center;gap:5px}.dm .material-symbols-rounded{font-size:13px;vertical-align:-2px}
+  .fopt b{display:flex;align-items:center;justify-content:center;gap:5px}.e-ico .material-symbols-rounded{font-size:38px}.hl .material-symbols-rounded{font-size:15px;vertical-align:-3px}
+  .discover-title{font-size:27px;line-height:1.08;letter-spacing:-.045em;font-weight:800;max-width:360px}
+  .live-note{display:inline-flex;align-items:center;margin-left:5px;color:var(--muted);font-size:9.5px;font-weight:700}.live-note.live{color:var(--free)}.live-note.loading{color:var(--accent-2)}
+  .discover-title span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .discover-sub{color:var(--muted);font-size:12.5px;line-height:1.5;margin:7px 0 13px}
+  .discover-search{height:47px;border-radius:15px;border:1px solid var(--line);background:var(--surface);display:flex;align-items:center;gap:9px;padding:0 13px;transition:border-color .15s,box-shadow .15s}
+  .discover-search:focus-within{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(56,189,248,.12)}
+  .discover-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-size:13px}
+  .surprise{border:0;background:var(--grad);color:white;height:35px;padding:0 12px;border-radius:11px;font:inherit;font-size:11.5px;font-weight:800;cursor:pointer;white-space:nowrap}
+  .quick-row{display:flex;gap:7px;overflow-x:auto;padding:10px 0 1px;scrollbar-width:none}.quick-row::-webkit-scrollbar{display:none}
+  .quick-chip{min-height:40px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:7px 13px;font:inherit;font-size:11px;font-weight:700;white-space:nowrap;cursor:pointer}
+  .quick-chip[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:transparent}
+  .panel-head{position:static;padding-top:6px}
+  .spotlight{margin:2px 6px 14px;min-height:180px;border-radius:22px;overflow:hidden;position:relative;background:linear-gradient(145deg,var(--c),#101827 72%);cursor:pointer;border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.18)}
+  .spotlight::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,8,14,.04),rgba(5,8,14,.9))}
+  .spotlight-art{position:absolute;z-index:1;right:24px;top:21px;width:82px;height:82px;border-radius:26px;display:grid;place-items:center;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.24);transform:rotate(7deg);box-shadow:0 16px 34px rgba(0,0,0,.22)}
+  .spotlight-art .cat-symbol{font-size:48px;color:#fff;transform:rotate(-7deg)}
+  .spotlight-copy{position:absolute;z-index:1;left:17px;right:17px;bottom:15px;color:white}.spotlight-kicker{font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;font-weight:800;color:#c4f4ff}.spotlight-copy b{display:block;font-size:19px;line-height:1.18;letter-spacing:-.02em;margin:4px 0}.spotlight-copy span{font-size:11.5px;opacity:.86}
+  .cards{gap:11px}
+  .card{align-items:stretch;padding:0;overflow:hidden;min-height:112px;border-radius:20px}
+  .card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.18)}
+  .cmedia{width:122px;min-height:112px;flex-shrink:0;position:relative;display:grid;place-items:center;background:linear-gradient(145deg,var(--c),#111827)}
+  .cmedia::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 35% 45%,rgba(255,255,255,.2),transparent 52%),linear-gradient(90deg,transparent 58%,var(--surface))}
+  .cmedia>.cat-symbol{position:relative;z-index:1;font-size:44px;color:#fff;filter:drop-shadow(0 5px 12px rgba(0,0,0,.24))}
+  .cmedia-tag{position:absolute;z-index:1;top:9px;left:9px;background:rgba(7,9,14,.72);color:white;backdrop-filter:blur(8px);padding:4px 7px;border-radius:999px;font-size:9.5px;font-weight:800}
+  .cbody{padding:13px 4px 12px 0;align-self:center}.card h3{font-size:13.5px;line-height:1.35}.cmeta{white-space:normal;line-height:1.45;font-size:10.8px;margin-top:5px}.ctime{color:var(--text);font-weight:700}.cwhy{font-size:10px;color:var(--accent-2);margin-top:4px;font-weight:700}
+  .cside{padding:11px 11px 10px 0;justify-content:space-between}.mini{margin-top:auto}.mini button{min-width:40px;min-height:40px}
+  .rail-head{padding-top:5px}.pick{min-width:156px;max-width:156px}.pick .thumb{height:90px;display:grid;place-items:center;background:linear-gradient(145deg,var(--c),#111827)}.pick .thumb .cat-symbol{font-size:40px;color:#fff}
+  .bottomnav{border-radius:18px;padding:6px 8px;gap:2px}.bn-btn,.bn-main{width:62px;height:50px;padding:5px 0;font-size:9.5px;gap:4px;border-radius:12px}.bn-btn .material-symbols-rounded,.bn-main .material-symbols-rounded{font-size:22px}.bn-btn[aria-current="page"]{color:var(--text);background:var(--surface)}.bn-main{color:var(--muted)}.bn-main .disc{width:auto;height:auto;border-radius:0;background:none;box-shadow:none;color:inherit;display:block}
+  .plan-list{display:flex;flex-direction:column;gap:8px;margin:10px 0 14px}.plan-option{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px;cursor:pointer}.plan-option input{width:18px;height:18px;accent-color:var(--accent)}.plan-option .po-copy{flex:1}.plan-option b{display:block;font-size:12.5px}.plan-option span{display:block;color:var(--muted);font-size:10.5px;margin-top:2px}.plan-preview{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.1);border-radius:16px;padding:13px;margin:11px 0;font-size:12px;line-height:1.5}.plan-preview b{display:block;margin-bottom:4px}.plan-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.plan-actions button{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:12px;padding:10px;font:inherit;font-size:11.5px;font-weight:700;cursor:pointer}.plan-actions .primary{grid-column:1/-1;background:var(--grad);border:0;color:white}
   @media (max-width:760px){
     #app{grid-template-columns:1fr;grid-template-rows:1fr}
     #mapwrap{padding:0}
@@ -300,82 +352,99 @@
     input,select{font-size:16px}
     .map-ctl{top:calc(14px + env(safe-area-inset-top))}
     .filter-fab{top:calc(14px + env(safe-area-inset-top))}
-    .bottomnav{bottom:calc(114px + env(safe-area-inset-bottom))}
-    aside{position:fixed;left:0;right:0;bottom:0;top:auto;height:86vh;background:var(--bg);border-top:1px solid var(--line);border-radius:24px 24px 0 0;box-shadow:0 -12px 34px rgba(0,0,0,.45);transition:transform .28s;z-index:1400;padding:0 10px env(safe-area-inset-bottom);transform:translateY(calc(100% - 104px - env(safe-area-inset-bottom)));overflow:hidden}
+    aside{position:fixed;inset:0;height:100dvh;background:var(--bg);border:0;border-radius:0;box-shadow:none;z-index:1400;padding:0 9px calc(88px + env(safe-area-inset-bottom)) 12px;transform:none;overflow-y:auto}
     aside.open{transform:none;overflow-y:auto}
-    .sheet-toggle{display:block;width:100%;background:none;border:none;padding:13px 0 5px;cursor:pointer}
+    .sheet-toggle{display:none}
     .sheet-toggle i{display:block;width:44px;height:5px;border-radius:3px;background:var(--line);margin:0 auto}
     header{padding:10px 12px 6px}
-    .bottomnav{bottom:64px}
+    .bottomnav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));width:calc(100% - 22px);justify-content:space-around;z-index:2100;background:rgba(20,24,36,.94)}
+    body.light .bottomnav{background:rgba(255,255,255,.94)}
+    body:not(.map-view) #map,body:not(.map-view) .map-ctl,body:not(.map-view) .filter-fab,body:not(.map-view) .searcharea{visibility:hidden}
+    body.map-view aside{display:none}
+    .discover-top{padding-top:calc(14px + env(safe-area-inset-top))}
+    .discover-title{font-size:30px}.spotlight{min-height:196px}.cmedia{width:118px}
     .detail{width:100%}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
-<body class="hasbanner">
+<body>
 <div class="appbanner" id="appBanner">
   <svg width="30" height="30" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="55%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs><rect width="100" height="100" rx="23" fill="url(#bg)"/><g transform="translate(50,50) rotate(28)"><path d="M0,-27 L9,2 L-9,2 Z" fill="#fff"/><path d="M0,27 L9,-2 L-9,-2 Z" fill="#fff" opacity=".45"/><circle r="5" fill="#fff"/></g></svg>
-  <div class="ab-t"><b>Whim</b><span>Smoother in the app — maps, saves & Thursday digests</span></div>
-  <button class="ab-open" id="abOpen">Open app</button>
-  <button class="ab-x" id="abX" aria-label="Dismiss">✕</button>
+  <div class="ab-t"><b>Whim</b><span>Prototype preview — maps, saves &amp; a sample Thursday digest</span></div>
+  <button class="ab-open" id="abOpen">Open native app</button>
+  <button class="ab-x" id="abX" aria-label="Dismiss"><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
 </div>
 <div id="app">
 
   <aside id="panel">
     <button class="sheet-toggle" id="sheetToggle" aria-label="Expand or collapse list"><i></i></button>
+    <section class="discover-top" aria-labelledby="discoverTitle">
+      <div class="discover-brand">
+        <div class="brand-mark" aria-hidden="true">W</div>
+        <div class="wordmark"><b>Whim</b><span>Your city, less predictable.</span></div>
+        <button class="top-icon" id="openDigest" aria-label="Open weekend digest" title="Weekend digest"><span class="material-symbols-rounded" aria-hidden="true">mail</span></button>
+        <button class="top-icon" id="themeToggle" aria-label="Toggle light or dark mode" title="Change theme"><span class="material-symbols-rounded" id="themeGlyph" aria-hidden="true">light_mode</span><span id="iconSun" hidden></span><span id="iconMoon" hidden></span></button>
+      </div>
+      <h1 class="discover-title" id="discoverTitle">Find your next <span>good story.</span></h1>
+      <p class="discover-sub">Thoughtful things to do tonight and this weekend, picked around your mood—not an endless directory.</p>
+      <div class="discover-search">
+        <span class="material-symbols-rounded" aria-hidden="true">search</span>
+        <input id="discoverSearch" type="search" placeholder="Search music, food, or a neighborhood" aria-label="Search events">
+        <button class="surprise" id="surpriseBtn">Surprise me</button>
+      </div>
+      <div class="quick-row" aria-label="Quick filters">
+        <button class="quick-chip" data-quick="tonight" aria-pressed="false">Tonight</button>
+        <button class="quick-chip" data-quick="weekend" aria-pressed="false">This weekend</button>
+        <button class="quick-chip" data-quick="free" aria-pressed="false">Free</button>
+        <button class="quick-chip" data-quick="outdoor" aria-pressed="false">Outside</button>
+        <button class="quick-chip" id="quickFilters">All filters</button>
+      </div>
+    </section>
     <div class="panel-head">
       <div style="flex:1;min-width:0">
-        <div class="ph-title">Happening near you</div>
-        <div class="ph-sub"><b id="count">0</b> events · near <span id="homeName">Seattle</span></div>
+        <div class="ph-title">Picked near <span id="homeName">Seattle</span></div>
+        <div class="ph-sub"><b id="count">0</b> good reasons to go out · <span class="live-note live" id="sourceNote">verified regional collection</span></div>
       </div>
-      <button class="area-chip" id="areaChip" style="display:none">Map area ✕</button>
+      <button class="area-chip" id="areaChip" style="display:none">Map area <span class="material-symbols-rounded" aria-hidden="true">close</span></button>
       <select class="sort" id="sortSel" aria-label="Sort events">
         <option value="date">Date</option>
         <option value="saves">Most saved</option>
         <option value="near">Near map center</option>
       </select>
     </div>
+    <div class="spotlight" id="spotlight" role="button" tabindex="0" aria-label="Featured event"></div>
     <div id="railWrap">
-      <div class="rail-head"><b>✦ Whims of the week</b><span>hand-picked</span></div>
+      <div class="rail-head"><b><span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span> Whims of the week</b><span>hand-picked</span></div>
       <div class="rail" id="rail"></div>
     </div>
     <div class="cards" id="cards"></div>
   </aside>
 
   <div id="mapwrap">
-    <div id="map"></div>
+    <div id="map" role="region" aria-label="Map of nearby events"></div>
     <div class="map-ctl">
       <div class="searchwrap" id="searchWrap">
-        <button class="mbtn" id="searchBtn" aria-label="Search a city or region">🔍</button>
+        <button class="mbtn" id="searchBtn" aria-label="Search a city or region"><span class="material-symbols-rounded" aria-hidden="true">search</span></button>
         <input id="searchInput" placeholder="Search a city or region…" aria-label="Search a city or region" maxlength="40">
         <div class="sugg" id="sugg"></div>
       </div>
+      <button class="mbtn" id="nearBtn" aria-label="Use my location" title="Use my location"><span class="material-symbols-rounded" aria-hidden="true">my_location</span></button>
     </div>
-    <button class="filter-fab" id="openFilters" aria-label="Filters">☰<span class="fbadge" id="fBadge" hidden>0</span></button>
-    <nav class="bottomnav" aria-label="Quick actions">
-      <button class="bn-btn" id="openLib" aria-label="My saved folders and submissions">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        Saved</button>
-      <button class="bn-btn" id="openDigest" aria-label="Weekend digest">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
-        Digest</button>
-      <button class="bn-main" id="nearBtn" aria-label="Near me">
-        <span class="disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span>
-        Near me</button>
-      <button class="bn-btn" id="themeToggle" aria-label="Toggle light or dark mode">
-        <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        Theme</button>
-      <button class="bn-btn" id="openSubmit" aria-label="Add an event">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-        Add</button>
+    <button class="filter-fab" id="openFilters" aria-label="Filters"><span class="material-symbols-rounded" aria-hidden="true">tune</span><span class="fbadge" id="fBadge" hidden>0</span></button>
+    <nav class="bottomnav" aria-label="Primary navigation">
+      <button class="bn-btn" id="discoverBtn" aria-current="page"><span class="material-symbols-rounded" aria-hidden="true">explore</span>Discover</button>
+      <button class="bn-btn" id="mapBtn"><span class="material-symbols-rounded" aria-hidden="true">map</span>Map</button>
+      <button class="bn-btn" id="openLib" aria-label="Saved events"><span class="material-symbols-rounded" aria-hidden="true">favorite</span>Saved</button>
+      <button class="bn-btn" id="openPlans" aria-label="Plans with friends"><span class="material-symbols-rounded" aria-hidden="true">group</span>Plans</button>
+      <button class="bn-btn" id="openSubmit" aria-label="Add an event"><span class="material-symbols-rounded" aria-hidden="true">add_circle</span>Add</button>
     </nav>
     <button class="searcharea" id="searchArea">Search this area</button>
   </div>
 </div>
 
 <!-- detail sheet -->
-<div class="detail-ov" id="detailOv"><div class="detail" id="detailPane"></div></div>
+<div class="detail-ov" id="detailOv"><div class="detail" id="detailPane" role="dialog" aria-modal="true" aria-labelledby="detailTitle" tabindex="-1"></div></div>
 
 <!-- filters sheet -->
 <div class="overlay" id="filterOverlay">
@@ -387,14 +456,14 @@
       <button data-range="today">Tonight</button>
       <button data-range="weekend">Weekend</button>
       <button data-range="week" aria-pressed="true">7 days</button>
-      <button data-range="extended">3 weeks</button>
+      <button data-range="extended">Next month</button>
     </div>
     <div class="daystrip" id="daystrip" role="group" aria-label="Pick a day"></div>
-    <button class="fopt" id="freeChip" aria-pressed="false" style="width:100%;margin-top:8px"><b>✦ Free events only</b><span>hide ticketed events</span></button>
+    <button class="fopt" id="freeChip" aria-pressed="false" style="width:100%;margin-top:8px"><b><span class="material-symbols-rounded" aria-hidden="true">money_off</span> Free events only</b><span>hide ticketed events</span></button>
     <div class="fsec">Map markers</div>
     <div class="seg segwide" role="group" aria-label="Marker style">
-      <button id="segIcons" aria-pressed="true">● Icons</button>
-      <button id="segLabels" aria-pressed="false">🏷 Labels</button>
+      <button id="segIcons" aria-pressed="true"><span class="material-symbols-rounded" aria-hidden="true">location_on</span> Icons</button>
+      <button id="segLabels" aria-pressed="false"><span class="material-symbols-rounded" aria-hidden="true">label</span> Labels</button>
     </div>
     <div class="fsec">List layout</div>
     <div class="seg segwide" role="group" aria-label="List layout">
@@ -402,12 +471,12 @@
       <button data-lmode="chip" aria-pressed="false">Date chips</button>
       <button data-lmode="hero" aria-pressed="false">Hero</button>
     </div>
-    <div class="fsec">How far will you go?</div>
+    <div class="fsec">How far will you go? · approximate radius</div>
     <div class="drive-row">
-      <button class="fopt" data-drive="0"><b>In-city</b><span>Seattle only</span></button>
-      <button class="fopt" data-drive="1"><b>&lt;1 hr</b><span>quick hop</span></button>
-      <button class="fopt" data-drive="2"><b>&lt;2 hr</b><span>day trip</span></button>
-      <button class="fopt" data-drive="3" aria-pressed="true"><b>&lt;3 hr</b><span>road trip</span></button>
+      <button class="fopt" data-drive="0"><b>In-city</b><span>Your selected city</span></button>
+      <button class="fopt" data-drive="1"><b>≈1 hour</b><span>up to ~60 mi</span></button>
+      <button class="fopt" data-drive="2"><b>≈2 hours</b><span>up to ~120 mi</span></button>
+      <button class="fopt" data-drive="3" aria-pressed="true"><b>≈3 hours</b><span>up to ~185 mi</span></button>
     </div>
     <div class="fsec">In the mood for · <button class="flink" id="catAll">all</button> / <button class="flink" id="catNone">none</button></div>
     <div class="cat-grid" id="catGrid"></div>
@@ -421,11 +490,28 @@
     <h2 id="libTitle">My stuff</h2>
     <p class="sub">Organize what you've saved into folders, and manage the events you've added.</p>
     <div class="lib-tabs">
-      <button id="libTabSaved" aria-selected="true">♥ Saved</button>
-      <button id="libTabSubs" aria-selected="false">📤 My events</button>
+      <button id="libTabSaved" aria-selected="true"><span class="material-symbols-rounded" aria-hidden="true">favorite</span> Saved</button>
+      <button id="libTabSubs" aria-selected="false"><span class="material-symbols-rounded" aria-hidden="true">upload</span> My events</button>
     </div>
     <div id="libBody"></div>
     <div class="modal-actions"><button class="btn-primary" id="closeLib">Done</button></div>
+  </div>
+</div>
+
+<!-- collaborative plans -->
+<div class="overlay" id="plansOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="plansTitle">
+    <h2 id="plansTitle">Make a plan together</h2>
+    <p class="sub">Choose a few good options, then send one link. Friends can vote without installing anything.</p>
+    <div class="field"><label for="planName">Plan name</label><input id="planName" value="Saturday with friends" maxlength="60"></div>
+    <div class="fsec">Choose up to 3 events</div>
+    <div class="plan-list" id="planList"></div>
+    <div class="plan-preview" id="planPreview"><b>Your mini ballot</b>Select events to create a shareable vote.</div>
+    <div class="plan-actions">
+      <button class="primary" id="sharePlan">Create &amp; copy invite link</button>
+      <button id="planCalendar">Add winner to calendar</button>
+      <button id="closePlans">Close</button>
+    </div>
   </div>
 </div>
 
@@ -435,13 +521,13 @@
     <h2 id="mTitle">Add an event</h2>
     <p class="sub">Public events go to a moderator queue and appear once approved. Private events pin instantly — only you see them.</p>
     <div class="vis-row" id="visRow">
-      <div class="vis-opt sel" data-vis="public" tabindex="0"><b>Public</b>Needs approval · everyone sees it</div>
-      <div class="vis-opt" data-vis="private" tabindex="0"><b>Private</b>Instant · only on your map</div>
+      <button type="button" class="vis-opt sel" data-vis="public" aria-pressed="true"><b>Public</b>Needs approval · everyone sees it</button>
+      <button type="button" class="vis-opt" data-vis="private" aria-pressed="false"><b>Private</b>Instant · only on your map</button>
     </div>
     <div class="field"><label for="fName">Event name</label><input id="fName" placeholder="e.g. Green Lake picnic meetup" maxlength="80"></div>
     <div class="field"><label for="fCat">Category</label><select id="fCat"></select></div>
-    <div class="field"><label for="fStart">Starts</label><input id="fStart" type="date" min="2026-07-15" value="2026-07-16"></div>
-    <div class="field"><label for="fEnd">Ends</label><input id="fEnd" type="date" min="2026-07-15" value="2026-07-16"></div>
+    <div class="field"><label for="fStart">Starts</label><input id="fStart" type="date"></div>
+    <div class="field"><label for="fEnd">Ends</label><input id="fEnd" type="date"></div>
     <div class="field"><label for="fPlace">Location</label><input id="fPlace" placeholder="e.g. Gas Works Park, Seattle" maxlength="90"></div>
     <div class="field"><label for="fUrl">Official link (optional)</label><input id="fUrl" placeholder="https://…" maxlength="200"></div>
     <div class="modal-actions">
@@ -459,34 +545,57 @@
       <div class="subj" id="dSubj"></div>
     </div>
     <div id="dBody"></div>
-    <div class="foot">Prototype of the weekly ritual: this lands every Thursday afternoon, built from your categories and drive radius. Save events (♥) to shape next week's whims.</div>
+    <div class="foot">Prototype of the weekly ritual: this lands every Thursday afternoon, built from your categories and drive radius. Saving events helps shape next week's whims.</div>
     <div class="modal-actions"><button class="btn-primary" id="closeDigest">Close</button></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 /* ============ helpers ============ */
 const $ = s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc = s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const localISO = d=>{
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+};
+const addDays=(iso,n)=>{const d=new Date(iso+"T12:00:00");d.setDate(d.getDate()+n);return localISO(d)};
+const TODAY=localISO(new Date());
+const tomorrow=addDays(TODAY,1);
+const todayDow=new Date(TODAY+"T12:00:00").getDay();
+const WEEKEND_START=addDays(TODAY,todayDow===6?-1:todayDow===0?-2:(5-todayDow+7)%7);
+const WEEKEND_END=addDays(WEEKEND_START,2);
 const fmt = d=>new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
 const overlap=(ev,s,e)=>!(ev.e<s||ev.s>e);
 const grad=cat=>{const r=CATS[cat].raw;return `--c1:${r};--c2:${r}88`};
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._x); t._x=setTimeout(()=>t.classList.remove("show"),3000); }
+const overlayOrigins=new Map();
+function showOverlay(selector,focusSelector){
+  const o=$(selector); overlayOrigins.set(o,document.activeElement); o.classList.add("open");
+  requestAnimationFrame(()=>o.querySelector(focusSelector||"button, input, select, [tabindex]")?.focus());
+}
+function hideOverlay(selector){
+  const o=$(selector); if(!o)return; const origin=overlayOrigins.get(o); o.classList.remove("open");
+  if(origin&&document.contains(origin)) origin.focus();
+}
+const PERSISTED=(()=>{try{return JSON.parse(localStorage.getItem("whim-v2")||"{}")||{}}catch{return {}}})();
 
 /* ============ data ============ */
 const CATS = {
-  festival:{e:"🎪",raw:"#ff6b57",label:"Festivals"},
-  music:{e:"🎵",raw:"#9d7bff",label:"Music"},
-  food:{e:"🍜",raw:"#ffb347",label:"Food"},
-  art:{e:"🎨",raw:"#ff6fb5",label:"Art"},
-  film:{e:"🎬",raw:"#5ea8ff",label:"Film"},
-  theater:{e:"🎭",raw:"#43d3ae",label:"Theater"},
-  community:{e:"🎉",raw:"#6fd66f",label:"Community"},
-  market:{e:"🌙",raw:"#c99a6d",label:"Markets"},
-  outdoor:{e:"🚵",raw:"#3fd699",label:"Outdoor"},
+  festival:{icon:"celebration",raw:"#ff6b57",label:"Festivals"},
+  music:{icon:"music_note",raw:"#9d7bff",label:"Music"},
+  food:{icon:"restaurant",raw:"#ffb347",label:"Food"},
+  art:{icon:"palette",raw:"#ff6fb5",label:"Art"},
+  film:{icon:"movie",raw:"#5ea8ff",label:"Film"},
+  theater:{icon:"theater_comedy",raw:"#43d3ae",label:"Theater"},
+  community:{icon:"groups",raw:"#6fd66f",label:"Community"},
+  market:{icon:"storefront",raw:"#c99a6d",label:"Markets"},
+  outdoor:{icon:"hiking",raw:"#3fd699",label:"Outdoor"},
 };
-const DRIVE_LABEL = ["In-city","<1 hr","1–2 hr","2–3 hr"];
+const catIcon=cat=>`<span class="material-symbols-rounded cat-symbol" aria-hidden="true">${CATS[cat].icon}</span>`;
+const timeOf=ev=>ev.time||((ev.sum||"").match(/\b(?:noon|midnight|\d{1,2}(?::\d{2})?\s?(?:am|pm))\b/i)||[])[0]||"Time on official site";
+const whyOf=ev=>ev.pick?"Whim pick":ev.free?"Great free option":ev.cat==="outdoor"?"Fresh-air favorite":"Popular nearby";
+const DRIVE_LABEL = ["In city","Within ~1 hour","Within ~2 hours","Within ~3 hours"];
 const EVENTS = [
  {t:"Dancing 'til Dusk",s:"2026-07-16",e:"2026-07-23",v:"Downtown Seattle parks (Tue & Thu)",lat:47.6107,lng:-122.3375,cat:"community",url:"https://www.dancingtildusk.com",free:true,ver:true,pick:true,sum:"Free one-hour dance lesson, then dancing in a downtown park. Tuesdays & Thursdays through August."},
  {t:"GreenStage: Shakespeare in the Park",s:"2026-07-15",e:"2026-08-05",v:"Various Seattle parks",lat:47.6303,lng:-122.3148,cat:"theater",url:"https://greenstage.org",free:true,ver:true,sum:"Free outdoor Shakespeare in parks around the city — bring a blanket and a picnic. Runs through Aug 15."},
@@ -540,73 +649,206 @@ const EVENTS = [
  {t:"SummerStage in Central Park",s:"2026-07-15",e:"2026-07-22",v:"Rumsey Playfield, Central Park, NYC",lat:40.7712,lng:-73.9700,cat:"music",url:"https://cityparksfoundation.org",free:true,ver:false,sum:"Free outdoor concerts all summer in the park — check the calendar for this week's lineup."},
  {t:"Bryant Park Picnic Performances",s:"2026-07-15",e:"2026-07-22",v:"Bryant Park, Midtown, NYC",lat:40.7536,lng:-73.9832,cat:"community",url:"https://bryantpark.org",free:true,ver:false,sum:"Free music, dance and theater on the lawn — bring a blanket, arrive early for space."},
  {t:"Smorgasburg Williamsburg",s:"2026-07-18",e:"2026-07-18",v:"Marsha P. Johnson State Park, Brooklyn",lat:40.7217,lng:-73.9576,cat:"food",url:"https://www.smorgasburg.com",free:true,ver:false,sum:"America's biggest open-air food market — 100ish vendors every Saturday, East River views."},
- {t:"Hollywood Bowl summer season",s:"2026-07-15",e:"2026-07-22",v:"Hollywood Bowl, Los Angeles",lat:34.1122,lng:-118.3391,cat:"music",url:"https://www.hollywoodbowl.com",free:false,ver:false,sum:"LA Phil and headliners under the stars — the definitive LA summer night. Check the week's program."},
- {t:"Smorgasburg LA",s:"2026-07-19",e:"2026-07-19",v:"ROW DTLA, Los Angeles",lat:34.0331,lng:-118.2337,cat:"food",url:"https://www.smorgasburg.com",free:true,ver:false,sum:"Sunday open-air food market downtown — free entry, come hungry."},
- {t:"Stern Grove Festival",s:"2026-07-19",e:"2026-07-19",v:"Sigmund Stern Grove, San Francisco",lat:37.7355,lng:-122.4767,cat:"music",url:"https://www.sterngrove.org",free:true,ver:false,sum:"Free Sunday concerts in a eucalyptus grove — an SF summer institution since 1938."},
  {t:"Millennium Park summer concerts",s:"2026-07-16",e:"2026-07-20",v:"Pritzker Pavilion, Chicago",lat:41.8826,lng:-87.6226,cat:"music",url:"#",free:true,ver:false,sum:"Free evening concerts at the Pritzker Pavilion — bring wine and a picnic to the Great Lawn."},
  {t:"Navy Pier summer fireworks",s:"2026-07-15",e:"2026-07-18",v:"Navy Pier, Chicago",lat:41.8917,lng:-87.6086,cat:"community",url:"https://navypier.org",free:true,ver:false,sum:"Fireworks over Lake Michigan, typically Wednesday and Saturday nights all summer."},
  {t:"Blues on the Green",s:"2026-07-15",e:"2026-07-15",v:"Zilker Park, Austin",lat:30.2669,lng:-97.7729,cat:"music",url:"#",free:true,ver:false,sum:"Austin's beloved free summer concert series on the Zilker lawn — tonight."},
  {t:"City Park Jazz",s:"2026-07-19",e:"2026-07-19",v:"City Park Pavilion, Denver",lat:39.7477,lng:-104.9500,cat:"music",url:"https://cityparkjazz.org",free:true,ver:false,sum:"Free Sunday-evening jazz by the lake — a Denver summer ritual."},
  {t:"Landmarks Orchestra at the Hatch Shell",s:"2026-07-15",e:"2026-07-15",v:"DCR Hatch Shell, Boston",lat:42.3563,lng:-71.0724,cat:"music",url:"#",free:true,ver:false,sum:"Free orchestral concert tonight on the Charles River Esplanade."},
  {t:"Portland Saturday Market",s:"2026-07-18",e:"2026-07-19",v:"Tom McCall Waterfront Park, Portland, OR",lat:45.5225,lng:-122.6699,cat:"market",url:"https://www.portlandsaturdaymarket.com",free:true,ver:false,sum:"The largest continuously operating open-air arts and crafts market in the US — weekends through December."},
- {t:"Harbourfront Centre summer series",s:"2026-07-15",e:"2026-07-22",v:"Harbourfront Centre, Toronto",lat:43.6387,lng:-79.3816,cat:"community",url:"https://harbourfrontcentre.com",free:true,ver:false,sum:"Free lakeside music, dance and festivals all summer on Toronto's waterfront."},
- {t:"Beaches International Jazz Festival",s:"2026-07-24",e:"2026-07-26",v:"Kew Gardens & Queen St E, Toronto",lat:43.6689,lng:-79.2996,cat:"music",url:"https://beachesjazz.com",free:true,ver:false,sum:"Free streetfest and jazz stages in Toronto's east end — late July; check dates."},
  {t:"Vancouver Folk Music Festival",s:"2026-07-17",e:"2026-07-19",v:"Jericho Beach Park, Vancouver, BC",lat:49.2726,lng:-123.1963,cat:"music",url:"https://thefestival.bc.ca",free:false,ver:false,pick:true,sum:"Mid-July weekend of folk and roots on the beach with mountain views."},
  {t:"Just for Laughs Festival",s:"2026-07-15",e:"2026-07-26",v:"Quartier des Spectacles, Montr\u00e9al",lat:45.5088,lng:-73.5670,cat:"theater",url:"https://www.hahaha.com",free:false,ver:false,sum:"The world's largest comedy festival takes over downtown Montr\u00e9al \u2014 free outdoor shows plus ticketed galas."},
  {t:"Lucha Libre at Arena M\u00e9xico",s:"2026-07-17",e:"2026-07-17",v:"Arena M\u00e9xico, Mexico City",lat:19.4260,lng:-99.1500,cat:"community",url:"#",free:false,ver:false,sum:"Masked wrestling Friday night \u2014 the cathedral of lucha libre."},
- /* ---- San Francisco Bay Area ---- */
- {t:"SF Jazz Fest 2026",s:"2026-07-16",e:"2026-07-19",v:"SFJAZZ Center, Hayes Valley",lat:37.7765,lng:-122.4212,cat:"music",url:"https://www.sfjazz.org",free:false,ver:true,sum:"Four days of jazz across the SFJAZZ Center — Lettuce headlines Friday."},
- {t:"Circus Bella in the Park",s:"2026-07-17",e:"2026-07-19",v:"San Francisco parks",lat:37.7690,lng:-122.4330,cat:"theater",url:"https://circusbella.org",free:true,ver:true,pick:true,sum:"Free one-ring circus: acrobats, aerialists, jugglers and a live six-piece band."},
- {t:"Hayes Valley Playland carnival",s:"2026-07-18",e:"2026-07-18",v:"Patricia's Green, Hayes Valley",lat:37.7764,lng:-122.4242,cat:"community",url:"#",free:true,ver:true,sum:"Neighborhood block party with Circus Bella performances, street games, prizes and local food."},
- {t:"SF Arts & Crafts Show at the Presidio",s:"2026-07-18",e:"2026-07-19",v:"210 Lincoln Blvd, Presidio",lat:37.7989,lng:-122.4550,cat:"art",url:"#",free:true,ver:true,sum:"Free open-air show of local artists, crafters and specialty vendors, 10am–6pm."},
- {t:"Clement Street Night Market",s:"2026-07-18",e:"2026-07-18",v:"Clement St, 22nd–25th Ave, Richmond",lat:37.7825,lng:-122.4820,cat:"market",url:"#",free:true,ver:true,sum:"Third-Saturday night market in the heart of the Richmond District."},
- {t:"World Cup Final at Yerba Buena Gardens",s:"2026-07-19",e:"2026-07-19",v:"Great Lawn, Yerba Buena Gardens",lat:37.7850,lng:-122.4023,cat:"community",url:"https://ybgfestival.org",free:true,ver:true,pick:true,sum:"Watch the FIFA World Cup Final on the big screen on the Great Lawn, 11am–4pm."},
- {t:"Soccer with the Sea Lions at Pier 39",s:"2026-07-18",e:"2026-07-19",v:"Pier 39, Fisherman's Wharf",lat:37.8087,lng:-122.4098,cat:"community",url:"https://www.pier39.com",free:true,ver:true,sum:"Free World Cup watch parties on the waterfront outdoor screen through the final."},
- {t:"Rainbow Kitten Surprise",s:"2026-07-18",e:"2026-07-18",v:"Greek Theatre, Berkeley",lat:37.8735,lng:-122.2545,cat:"music",url:"#",free:false,ver:true,sum:"Indie favorites at Berkeley's open-air Greek Theatre."},
- {t:"Mosswood Meltdown",s:"2026-07-17",e:"2026-07-19",v:"Mosswood Park, Oakland",lat:37.8244,lng:-122.2610,cat:"music",url:"https://mosswoodmeltdown.com",free:false,ver:true,sum:"Garage-punk weekend hosted by John Waters — Pavement, Wednesday and Vivian Girls, with a Friday pre-party."},
- {t:"Golden State Valkyries vs. (WNBA)",s:"2026-07-18",e:"2026-07-18",v:"Chase Center, Mission Bay",lat:37.7680,lng:-122.3877,cat:"community",url:"#",free:false,ver:true,sum:"WNBA basketball at Chase Center, with another home game Monday."},
- /* ---- Los Angeles ---- */
- {t:"Enjambre · Inspector · La Unión (free)",s:"2026-07-18",e:"2026-07-18",v:"Pershing Square, Downtown LA",lat:34.0482,lng:-118.2531,cat:"music",url:"#",free:true,ver:true,pick:true,sum:"Free downtown concert of Latin rock heavyweights, from 3pm."},
- {t:"Fuerza Regida at Dodger Stadium",s:"2026-07-17",e:"2026-07-18",v:"Dodger Stadium",lat:34.0739,lng:-118.2400,cat:"music",url:"#",free:false,ver:false,sum:"Stadium-scale corridos — sources list both Friday and Saturday, check tickets for your night."},
- {t:"LA World Cup 26 Fan Zone",s:"2026-07-18",e:"2026-07-19",v:"Downtown Burbank",lat:34.1808,lng:-118.3090,cat:"community",url:"#",free:true,ver:true,sum:"Free international street fair with live match coverage on LED screens, global food and family games. Register online."},
- {t:"Los Lobos — Marina del Rey Summer Concerts",s:"2026-07-18",e:"2026-07-18",v:"Burton Chace Park, Marina del Rey",lat:33.9803,lng:-118.4517,cat:"music",url:"#",free:true,ver:true,sum:"Free waterside concert at 7pm — bring blankets and low-back chairs."},
- {t:"Bob Moses + Cannons at the Bowl",s:"2026-07-19",e:"2026-07-19",v:"Hollywood Bowl",lat:34.1122,lng:-118.3391,cat:"music",url:"https://www.hollywoodbowl.com",free:false,ver:true,sum:"Electronic-leaning Sunday night under the stars."},
- {t:"The Lord of the Rings in Concert",s:"2026-07-16",e:"2026-07-18",v:"Peacock Theatre, Downtown LA",lat:34.0430,lng:-118.2673,cat:"film",url:"#",free:false,ver:true,sum:"The Fellowship of the Ring 25th-anniversary screening with live orchestra."},
- {t:"Plumeria Festival",s:"2026-07-17",e:"2026-07-18",v:"LA County Arboretum, Arcadia",lat:34.1447,lng:-118.0523,cat:"festival",url:"https://www.arboretum.org",free:false,ver:true,sum:"Island vibes: 100+ flowering trees, lei-making, Tahitian drumming, fire dance and food trucks."},
- {t:"COAST Open Streets Santa Monica",s:"2026-07-19",e:"2026-07-19",v:"Santa Monica",lat:34.0195,lng:-118.4912,cat:"outdoor",url:"https://www.santamonica.gov",free:true,ver:true,sum:"Streets close to cars and open to bikes, skates and wanderers — free festival across the city."},
- {t:"Sunset Concerts at the Skirball",s:"2026-07-16",e:"2026-07-16",v:"Skirball Cultural Center",lat:34.1305,lng:-118.4741,cat:"music",url:"https://www.skirball.org",free:true,ver:true,sum:"Season 29 opens with Cory Henry & the Funk Apostles plus Katalyst — free, doors 6pm."},
- {t:"Night Sky Festival",s:"2026-07-18",e:"2026-07-18",v:"Peter Strauss Ranch, Agoura Hills",lat:34.1092,lng:-118.7601,cat:"outdoor",url:"#",free:true,ver:true,sum:"Family stargazing in the Santa Monica Mountains, 7–10pm."},
- /* ---- Toronto ---- */
- {t:"Beaches Jazz TD Weekend",s:"2026-07-17",e:"2026-07-19",v:"Woodbine Park, Toronto",lat:43.6630,lng:-79.3120,cat:"music",url:"https://beachesjazz.com",free:true,ver:true,pick:true,sum:"Free festival weekend kicking off with a 90s night, then two days of bands in the park."},
- {t:"BIG on Bloor",s:"2026-07-18",e:"2026-07-19",v:"Bloor St W, Dufferin–Lansdowne",lat:43.6580,lng:-79.4360,cat:"festival",url:"#",free:true,ver:true,sum:"Bloor West goes car-free: art installations, performances and food vendors, noon to midnight."},
- {t:"Toronto BrazilFest",s:"2026-07-18",e:"2026-07-19",v:"Earlscourt Park, Toronto",lat:43.6770,lng:-79.4470,cat:"festival",url:"https://brazilfest.ca",free:true,ver:true,sum:"Canada's biggest Brazilian festival — samba, capoeira and churrasco in the park."},
- {t:"Taste of Vietnam",s:"2026-07-16",e:"2026-07-18",v:"Nathan Phillips Square, Toronto",lat:43.6525,lng:-79.3832,cat:"food",url:"#",free:true,ver:true,sum:"Vietnamese cuisine, culture and live entertainment at City Hall's square."},
- {t:"I Love Scarborough Festival",s:"2026-07-18",e:"2026-07-19",v:"Bridlewood Mall, Scarborough",lat:43.7990,lng:-79.3180,cat:"community",url:"#",free:true,ver:true,sum:"Free two-day celebration: multicultural performances, World Cup screenings, rides and food vendors."},
- {t:"Unity Fest",s:"2026-07-18",e:"2026-07-18",v:"Harbourfront Centre, Toronto",lat:43.6390,lng:-79.3800,cat:"community",url:"https://harbourfrontcentre.com",free:true,ver:true,sum:"Hip-hop dance battles, live performances and free all-ages events on the waterfront."},
- {t:"Salsa on Market Street",s:"2026-07-17",e:"2026-07-31",v:"Market St, Old Town Toronto",lat:43.6486,lng:-79.3715,cat:"community",url:"#",free:true,ver:false,sum:"Two weeks of dance and food celebrating salsa culture in Old Town."},
- {t:"Cirque du Soleil: LUZIA",s:"2026-07-17",e:"2026-08-05",v:"Under the Big Top, Lake Shore Blvd",lat:43.6290,lng:-79.4180,cat:"theater",url:"https://www.cirquedusoleil.com",free:false,ver:true,sum:"A waking dream of Mexico under the big top on the lakeshore."},
- {t:"Billy Talent + Death From Above 1979",s:"2026-07-18",e:"2026-07-18",v:"RBC Amphitheatre, Toronto",lat:43.6292,lng:-79.4152,cat:"music",url:"#",free:false,ver:true,sum:"Canadian rock double bill on the lakeshore, 7pm."},
- {t:"Death Cab for Cutie + Japanese Breakfast",s:"2026-07-19",e:"2026-07-19",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4150,cat:"music",url:"#",free:false,ver:true,sum:"The I Built You A Tower tour lands lakeside Sunday, 7:15pm."},
- {t:"Blue Jays homestand",s:"2026-07-17",e:"2026-07-19",v:"Rogers Centre, Toronto",lat:43.6414,lng:-79.3894,cat:"community",url:"https://www.mlb.com/bluejays",free:false,ver:true,sum:"Weekend baseball downtown, including Saturday's statue-unveil game."},
- {t:"SummerSeries at Trillium Park",s:"2026-07-18",e:"2026-08-05",v:"Trillium Park, Ontario Place",lat:43.6280,lng:-79.4130,cat:"music",url:"#",free:true,ver:true,sum:"Free live music, art and cultural programming on the lakefront through mid-August."},
- {t:"Dream in High Park: Twelfth Night",s:"2026-07-15",e:"2026-08-05",v:"High Park Amphitheatre, Toronto",lat:43.6465,lng:-79.4637,cat:"theater",url:"https://www.canadianstage.com",free:false,ver:true,sum:"Shakespeare under the stars in High Park, running into September — pay what you can."},
+ /* ---- Greater Toronto Area: official sources checked July 16, 2026 ---- */
+ /* Toronto festivals, culture and sports */
+ {t:"Taste of Vietnam",s:"2026-07-16",e:"2026-07-18",time:"Thu 6pm · Fri–Sat 11am",v:"Nathan Phillips Square, Toronto",lat:43.6535,lng:-79.3839,cat:"food",url:"https://www.toronto.ca/services-payments/venues-facilities-bookings/booking-city-facilities/city-squares/nathan-phillips-square/events-happening-on-nathan-phillips-square/",free:true,ver:true,pick:true,provider:"City of Toronto",checked:"2026-07-16",sum:"Free Vietnamese food, performances, art and cultural showcases at City Hall."},
+ {t:"Lavazza IncluCity Festival",s:"2026-06-25",e:"2026-07-19",v:"Distillery District and Toronto venues",lat:43.6503,lng:-79.3596,cat:"film",url:"https://icff.ca/",free:false,ver:true,provider:"ICFF",checked:"2026-07-16",sum:"Italian and international films, tastings and cultural programming; the festival closes July 19."},
+ {t:"Summerlicious",s:"2026-07-03",e:"2026-07-19",v:"240+ restaurants across Toronto",lat:43.6532,lng:-79.3832,cat:"food",url:"https://www.toronto.ca/explore-enjoy/festivals-events/summerlicious/",free:false,ver:true,provider:"City of Toronto",checked:"2026-07-16",sum:"Three-course prix-fixe lunch and dinner menus at more than 240 participating restaurants."},
+ {t:"Beaches Jazz TD Weekend",s:"2026-07-17",e:"2026-07-19",v:"Woodbine Park, Toronto",lat:43.6635,lng:-79.3114,cat:"music",url:"https://www.beachesjazz.com/tdweekend",free:true,ver:true,pick:true,provider:"Beaches Jazz Festival",checked:"2026-07-16",sum:"Three free days of live bands and DJs in Woodbine Park."},
+ {t:"FIFA Fan Festival Toronto — final weekend",s:"2026-07-18",e:"2026-07-19",time:"Sat 2pm · Sun noon",v:"Fort York and The Bentway, Toronto",lat:43.6397,lng:-79.4066,cat:"community",url:"https://www.toronto.ca/explore-enjoy/festivals-events/fifa-world-cup-26/",free:true,ver:true,pick:true,provider:"City of Toronto",checked:"2026-07-16",sum:"Official World Cup fan destination with match broadcasts, entertainment and food; admission availability is limited."},
+ {t:"FIFA World Cup broadcasts at Nathan Phillips Square",s:"2026-07-18",e:"2026-07-19",time:"Sat 5pm · Sun 3pm",v:"Nathan Phillips Square, Toronto",lat:43.6536,lng:-79.3838,cat:"community",url:"https://www.toronto.ca/explore-enjoy/festivals-events/fifa-world-cup-26/match-broadcasts/",free:true,ver:true,provider:"City of Toronto",checked:"2026-07-16",sum:"Free outdoor broadcasts of the bronze final Saturday and championship final Sunday."},
+ {t:"BIG on Bloor Festival",s:"2026-07-18",e:"2026-07-19",time:"Sat noon–midnight · Sun noon–9pm",v:"Bloor St W, Dufferin to Lansdowne",lat:43.6597,lng:-79.4380,cat:"art",url:"https://bigonbloorfestival.com/",free:true,ver:true,pick:true,provider:"BIG on Bloor",checked:"2026-07-16",sum:"A car-free arts and culture takeover with installations, performances, workshops and local food."},
+ {t:"Toronto International BrazilFest",s:"2026-07-18",e:"2026-07-19",v:"Earlscourt Park, Toronto",lat:43.6742,lng:-79.4518,cat:"festival",url:"https://brazilfest.ca/",free:true,ver:true,provider:"BrazilFest",checked:"2026-07-16",sum:"Two days of Brazilian music, dance, capoeira, food and family programming."},
+ {t:"Junior Carnival Parade",s:"2026-07-18",e:"2026-07-18",time:"9:30am–8pm",v:"Neilson Park, Malvern",lat:43.8170,lng:-79.2247,cat:"festival",url:"https://torontocarnival.ca/official-launch-countdown/",free:true,ver:true,pick:true,provider:"Toronto Caribbean Carnival",checked:"2026-07-16",sum:"Young masqueraders bring costumes, music and Caribbean carnival traditions to Scarborough."},
+ {t:"Unity Fest",s:"2026-07-18",e:"2026-07-18",v:"Harbourfront Centre, Toronto",lat:43.6389,lng:-79.3818,cat:"community",url:"https://harbourfrontcentre.com/summer/",free:true,ver:true,provider:"Harbourfront Centre",checked:"2026-07-16",sum:"Canada's homegrown hip-hop festival returns with dance battles, performances and all-ages activities."},
+ {t:"SummerSeries in Trillium Park — July weekends",s:"2026-07-18",e:"2026-07-26",v:"Trillium Park, Ontario Place",lat:43.6290,lng:-79.4095,cat:"music",url:"https://ontarioplace.com/en/whats-on/summerseries/",free:true,ver:true,pick:true,provider:"Ontario Place",checked:"2026-07-16",sum:"Free Summer Live Music July 18, Indigenous Sounds Now July 19, Mixto Festival July 25 and City Hall Live July 26."},
+ {t:"Beaches Jazz StreetFest",s:"2026-07-23",e:"2026-07-25",time:"6pm–midnight",v:"Queen St E, Woodbine to Beech",lat:43.6720,lng:-79.2960,cat:"music",url:"https://www.beachesjazz.com/streetfest",free:true,ver:true,pick:true,provider:"Beaches Jazz Festival",checked:"2026-07-16",sum:"Queen Street East closes for three evenings of bands, food trucks and vendors."},
+ {t:"Beaches Jazz OLG Weekend",s:"2026-07-24",e:"2026-07-26",v:"Woodbine Park, Toronto",lat:43.6635,lng:-79.3114,cat:"music",url:"https://www.beachesjazz.com/olg",free:true,ver:true,provider:"Beaches Jazz Festival",checked:"2026-07-16",sum:"The festival's closing weekend brings more free live music to Woodbine Park."},
+ {t:"Panamerican Food & Music Festival",s:"2026-07-24",e:"2026-07-26",v:"Nathan Phillips Square, Toronto",lat:43.6535,lng:-79.3839,cat:"food",url:"https://www.panamfest.com/",free:true,ver:true,provider:"Panamerican Food & Music Festival",checked:"2026-07-16",sum:"Cuisine, music, dance and cultural showcases from across the Americas."},
+ {t:"OCPA Calypso Showcase: Kaiso 365",s:"2026-07-25",e:"2026-07-25",time:"8pm",v:"Hungarian Canadian Cultural Centre, North York",lat:43.7168,lng:-79.3147,cat:"music",url:"https://torontocarnival.ca/official-launch-countdown/",free:false,ver:true,provider:"Toronto Caribbean Carnival",checked:"2026-07-16",sum:"A ticketed showcase of calypso artists and the living kaiso tradition."},
+ {t:"Toronto Carnival King & Queen Showcase",s:"2026-07-30",e:"2026-07-30",time:"5pm–2am",v:"Lamport Stadium, Toronto",lat:43.6389,lng:-79.4235,cat:"festival",url:"https://torontocarnival.ca/official-launch-countdown/",free:false,ver:true,provider:"Toronto Caribbean Carnival",checked:"2026-07-16",sum:"Mas bands unveil their most elaborate large costumes under the stadium lights."},
+ {t:"Toronto Panorama",s:"2026-07-31",e:"2026-07-31",time:"7pm–midnight",v:"Lamport Stadium, Toronto",lat:43.6389,lng:-79.4235,cat:"music",url:"https://torontocarnival.ca/official-launch-countdown/",free:false,ver:true,provider:"Toronto Caribbean Carnival",checked:"2026-07-16",sum:"Toronto steelbands compete in the carnival's official Panorama celebration."},
+ {t:"Cirque du Soleil: LUZIA",s:"2026-06-18",e:"2026-08-30",v:"Under the Big Top, 2150 Lake Shore Blvd W",lat:43.6238,lng:-79.4784,cat:"theater",url:"https://www.cirquedusoleil.com/luzia/buy-tickets?city=toronto&country=canada",free:false,ver:true,pick:true,provider:"Cirque du Soleil",checked:"2026-07-16",sum:"Cirque's water-filled acrobatic journey through a fantastical Mexico, now performing in Toronto."},
+ {t:"Dream in High Park: Twelfth Night",s:"2026-07-12",e:"2026-09-06",v:"High Park Amphitheatre, Toronto",lat:43.6464,lng:-79.4635,cat:"theater",url:"https://www.canadianstage.com/shows-events/dream-in-high-park-26",free:false,ver:true,pick:true,provider:"Canadian Stage",checked:"2026-07-16",sum:"Shakespeare's romantic comedy under the stars; regular and low-cost rush tickets are available."},
+ {t:"Toronto Blue Jays vs. Chicago White Sox",s:"2026-07-17",e:"2026-07-19",time:"Fri 7:07pm · weekend games",v:"Rogers Centre, Toronto",lat:43.6414,lng:-79.3894,cat:"community",url:"https://www.mlb.com/bluejays/schedule",free:false,ver:true,provider:"Toronto Blue Jays / MLB",checked:"2026-07-16",sum:"A three-game weekend series at Rogers Centre."},
+
+ /* Toronto outdoor movies and garden concerts */
+ {t:"TOPS: It Must Be Heaven",s:"2026-07-19",e:"2026-07-19",time:"Sundown",v:"Christie Pits Park, Toronto",lat:43.6647,lng:-79.4200,cat:"film",url:"https://www.topictureshow.com/2026-calendar",free:true,ver:true,provider:"Toronto Outdoor Picture Show",checked:"2026-07-16",sum:"Free captioned outdoor screening with a Canadian short film; bring a blanket or folding chair."},
+ {t:"TOPS: It Was Just an Accident",s:"2026-07-23",e:"2026-07-23",time:"Sundown",v:"Corktown Common, Toronto",lat:43.6552,lng:-79.3532,cat:"film",url:"https://www.topictureshow.com/2026-calendar",free:true,ver:true,provider:"Toronto Outdoor Picture Show",checked:"2026-07-16",sum:"Free captioned outdoor cinema in Corktown Common."},
+ {t:"TOPS: O Brother, Where Art Thou?",s:"2026-07-26",e:"2026-07-26",time:"Sundown",v:"Christie Pits Park, Toronto",lat:43.6647,lng:-79.4200,cat:"film",url:"https://www.topictureshow.com/2026-calendar",free:true,ver:true,provider:"Toronto Outdoor Picture Show",checked:"2026-07-16",sum:"Free open-air screening paired with short films at Christie Pits."},
+ {t:"TOPS: Speed",s:"2026-07-30",e:"2026-07-30",time:"Sundown",v:"Corktown Common, Toronto",lat:43.6552,lng:-79.3532,cat:"film",url:"https://www.topictureshow.com/2026-calendar",free:true,ver:true,provider:"Toronto Outdoor Picture Show",checked:"2026-07-16",sum:"The action classic screens outdoors with the short film Le Tour de Canada."},
+ {t:"Summer Music in the Garden: Acalypha",s:"2026-07-19",e:"2026-07-19",time:"4pm",v:"Toronto Music Garden",lat:43.6368,lng:-79.3942,cat:"music",url:"https://harbourfrontcentre.com/series/summer-music-in-the-garden/",free:true,ver:true,provider:"Harbourfront Centre",checked:"2026-07-16",sum:"Ancient modal music traditions of Asia and the Mediterranean in the waterfront garden."},
+ {t:"Summer Music in the Garden: Summertime Swing",s:"2026-07-23",e:"2026-07-23",time:"7pm",v:"Toronto Music Garden",lat:43.6368,lng:-79.3942,cat:"music",url:"https://harbourfrontcentre.com/series/summer-music-in-the-garden/",free:true,ver:true,provider:"Harbourfront Centre",checked:"2026-07-16",sum:"An evening of timeless standards from jazz's golden age."},
+ {t:"Summer Music in the Garden: Rhythm Speaks Many Languages",s:"2026-07-26",e:"2026-07-26",time:"4pm",v:"Toronto Music Garden",lat:43.6368,lng:-79.3942,cat:"music",url:"https://harbourfrontcentre.com/series/summer-music-in-the-garden/",free:true,ver:true,provider:"Harbourfront Centre",checked:"2026-07-16",sum:"South Asian rhythm, West African groove and contemporary influences meet by the lake."},
+ {t:"Summer Music in the Garden: It's A Gut Feeling",s:"2026-07-30",e:"2026-07-30",time:"7pm",v:"Toronto Music Garden",lat:43.6368,lng:-79.3942,cat:"music",url:"https://harbourfrontcentre.com/series/summer-music-in-the-garden/",free:true,ver:true,provider:"Harbourfront Centre",checked:"2026-07-16",sum:"Historically informed strings from Elixir Baroque Ensemble."},
+
+ /* Major Toronto concerts — official Ticketmaster listings */
+ {t:"Tim McGraw: Pawn Shop Guitar Tour",s:"2026-07-16",e:"2026-07-16",time:"7pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/rbc-amphitheatre-tickets-toronto/venue/131073",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"Tim McGraw's 2026 tour stops at the lakeside amphitheatre."},
+ {t:"Chris Lake",s:"2026-07-17",e:"2026-07-17",time:"6pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/rbc-amphitheatre-tickets-toronto/venue/131073",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"An evening of house music at RBC Amphitheatre."},
+ {t:"Billy Talent II 20th Anniversary",s:"2026-07-18",e:"2026-07-18",time:"7pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/billy-talent-tickets/artist/980702",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"Billy Talent with Death From Above 1979 and Hollerado."},
+ {t:"Death Cab for Cutie: I Built You A Tower Tour",s:"2026-07-19",e:"2026-07-19",time:"7:15pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/rbc-amphitheatre-tickets-toronto/venue/131073",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"Death Cab for Cutie with Japanese Breakfast on the lakeshore."},
+ {t:"The Black Crowes and Whiskey Myers",s:"2026-07-21",e:"2026-07-21",time:"6:30pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/rbc-amphitheatre-tickets-toronto/venue/131073",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"The Southern Hospitality Tour brings two roots-rock headliners together."},
+ {t:"IVE World Tour: Show What I Am",s:"2026-07-21",e:"2026-07-21",time:"8pm",v:"Scotiabank Arena, Toronto",lat:43.6435,lng:-79.3791,cat:"music",url:"https://www.ticketmaster.ca/discover/toronto?categoryId=KZFzniwnSyZfZ7v7nJ&date=thismonth",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"K-pop group IVE brings its world tour to Scotiabank Arena."},
+ {t:"Mötley Crüe: Return of the Carnival of Sins",s:"2026-07-22",e:"2026-07-22",time:"6:30pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/rbc-amphitheatre-tickets-toronto/venue/131073",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"Mötley Crüe returns to Toronto with its Carnival of Sins tour."},
+ {t:"311 and Dirty Heads: So Glad You Made It Tour",s:"2026-07-26",e:"2026-07-26",time:"5:30pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/rbc-amphitheatre-tickets-toronto/venue/131073",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"311 and Dirty Heads share the amphitheatre bill."},
+ {t:"J. Cole: The Fall-Off Tour",s:"2026-07-27",e:"2026-07-27",time:"8pm",v:"Scotiabank Arena, Toronto",lat:43.6435,lng:-79.3791,cat:"music",url:"https://www.ticketmaster.ca/discover/toronto?categoryId=KZFzniwnSyZfZ7v7nJ&date=thismonth",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"J. Cole brings The Fall-Off Tour to downtown Toronto."},
+ {t:"Styx & Chicago: The Windy Cities Tour",s:"2026-07-28",e:"2026-07-28",time:"7pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/rbc-amphitheatre-tickets-toronto/venue/131073",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"Two classic-rock bands share a summer-night bill."},
+ {t:"KAROL G: Tropitour",s:"2026-07-29",e:"2026-07-29",time:"7pm",v:"Rogers Stadium, Toronto",lat:43.7468,lng:-79.4781,cat:"music",url:"https://www.ticketmaster.ca/discover/toronto?categoryId=KZFzniwnSyZfZ7v7nJ&date=thismonth",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"Karol G's stadium-scale Tropitour arrives in Toronto."},
+ {t:"Lynyrd Skynyrd x Foreigner",s:"2026-07-30",e:"2026-07-30",time:"6:30pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/rbc-amphitheatre-tickets-toronto/venue/131073",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"The Double Trouble Double Vision Tour pairs two rock catalogues."},
+ {t:"NE-YO & AKON: Nights Like This Tour",s:"2026-07-31",e:"2026-07-31",time:"8pm",v:"RBC Amphitheatre, Toronto",lat:43.6294,lng:-79.4152,cat:"music",url:"https://www.ticketmaster.ca/rbc-amphitheatre-tickets-toronto/venue/131073",free:false,ver:true,provider:"Ticketmaster",checked:"2026-07-16",sum:"Ne-Yo and Akon close July with a shared lakeside show."},
+
+ /* Mississauga */
+ {t:"Mississauga Asian Night Market",s:"2026-07-17",e:"2026-07-19",time:"Fri 5pm · weekend",v:"Square One P6, Mississauga",lat:43.5924,lng:-79.6425,cat:"market",url:"https://www.visitmississauga.ca/events/month/",free:true,ver:true,pick:true,provider:"Visit Mississauga",checked:"2026-07-16",sum:"A free three-day multicultural night market with food vendors and live entertainment."},
+ {t:"RED FM Summer Bhangra Jam",s:"2026-07-18",e:"2026-07-18",time:"Noon–11pm",v:"Mississauga Celebration Square",lat:43.5887,lng:-79.6441,cat:"festival",url:"https://www.visitmississauga.ca/summer-festivals-2026/",free:true,ver:true,provider:"Visit Mississauga",checked:"2026-07-16",sum:"A high-energy celebration of Punjabi music, dance and community."},
+ {t:"Music of the World — A Tribute to the Beautiful Game",s:"2026-07-18",e:"2026-07-18",time:"7:30pm",v:"Living Arts Centre, Mississauga",lat:43.5899,lng:-79.6467,cat:"music",url:"https://www.visitmississauga.ca/events/month/",free:false,ver:true,provider:"Visit Mississauga",checked:"2026-07-16",sum:"The Mississauga Symphony tours football nations through tango, samba and orchestral music."},
+ {t:"Watch the World Play — Final Game",s:"2026-07-19",e:"2026-07-19",time:"3–5pm",v:"Mississauga Celebration Square",lat:43.5887,lng:-79.6441,cat:"community",url:"https://www.visitmississauga.ca/events/month/",free:true,ver:true,provider:"Visit Mississauga",checked:"2026-07-16",sum:"Free outdoor championship-final viewing on Celebration Square's big screens."},
+ {t:"Bollywood Monster Mashup",s:"2026-07-24",e:"2026-07-26",time:"Fri 6pm · weekend",v:"Mississauga Celebration Square",lat:43.5887,lng:-79.6441,cat:"festival",url:"https://www.visitmississauga.ca/summer-festivals-2026/",free:true,ver:true,pick:true,provider:"Visit Mississauga",checked:"2026-07-16",sum:"Three free days of South Asian music, dance workshops, food and family activities."},
+ {t:"Let's Event Summer Festival",s:"2026-07-25",e:"2026-07-25",time:"1pm",v:"Mississauga, Ontario",lat:43.5890,lng:-79.6440,cat:"festival",url:"https://www.mississauga.ca/events-and-attractions/events-calendar/lets-event-summer-festival-2026/?eventdate=2026-07-25T13%3A00%3A00&schedule=25817",free:true,ver:true,provider:"City of Mississauga",checked:"2026-07-16",sum:"A city-listed summer community festival; check the official page for the latest program and site details."},
+ {t:"Mosaic Festival",s:"2026-07-31",e:"2026-08-01",time:"Fri 5–11pm",v:"Mississauga Celebration Square",lat:43.5887,lng:-79.6441,cat:"festival",url:"https://www.visitmississauga.ca/events/month/",free:true,ver:true,provider:"Visit Mississauga",checked:"2026-07-16",sum:"The GTA's long-running South Asian arts festival combines performances, a bazaar, food and a kids zone."},
+
+ /* Brampton */
+ {t:"Vibrant Brampton Summer Fest",s:"2026-07-16",e:"2026-07-19",time:"Thu–Sun",v:"Gage Park, Brampton",lat:43.6834,lng:-79.7609,cat:"festival",url:"https://vibrantbrampton.ca/",free:true,ver:true,pick:true,provider:"Vibrant Brampton",checked:"2026-07-16",sum:"Four days of South Asian and cross-cultural music, dance, art, food and family activities."},
+ {t:"Canada Celebrates FIFA World Cup — Brampton",s:"2026-07-18",e:"2026-07-19",v:"Garden Square, Brampton",lat:43.6875,lng:-79.7606,cat:"community",url:"https://www.brampton.ca/EN/Arts-Culture-Tourism/Experience-Brampton/Pages/Summer-of-Soccer-in-Brampton.aspx",free:true,ver:true,provider:"City of Brampton",checked:"2026-07-16",sum:"Two days of free match screenings, fan activities and community celebrations."},
+ {t:"Brampton Farmers' Market — July 18",s:"2026-07-18",e:"2026-07-18",time:"8am–1pm",v:"Main Street North, Downtown Brampton",lat:43.6870,lng:-79.7613,cat:"market",url:"https://www.brampton.ca/EN/Arts-Culture-Tourism/Experience-Brampton/Dine-and-Shop/Pages/Brampton-Farmers-Market.aspx",free:true,ver:true,provider:"City of Brampton",checked:"2026-07-16",sum:"Fresh produce, prepared food and local crafts in the pedestrian-friendly downtown market."},
+ {t:"Brampton Summer Artist Market",s:"2026-07-19",e:"2026-07-19",time:"10:30am–4pm",v:"Brampton Library, Springdale Branch",lat:43.7481,lng:-79.7273,cat:"art",url:"https://bramptonartsorg.ca/programs-projects/artist-market/",free:true,ver:true,provider:"Brampton Arts Organization",checked:"2026-07-16",sum:"A one-day market spotlighting Brampton-area artists and creative makers."},
+ {t:"ChutneyFest",s:"2026-07-24",e:"2026-07-25",v:"Gage Park, Brampton",lat:43.6834,lng:-79.7609,cat:"festival",url:"https://chutneyfest.org/",free:true,ver:true,pick:true,provider:"ChutneyFest",checked:"2026-07-16",sum:"A free Indo-Caribbean celebration of chutney soca, dance, drumming and food."},
+ {t:"Festival of India Brampton",s:"2026-07-25",e:"2026-07-25",time:"11am",v:"Downtown Brampton",lat:43.6868,lng:-79.7610,cat:"festival",url:"https://foibrampton.com/",free:true,ver:true,provider:"Festival of India Brampton",checked:"2026-07-16",sum:"A free Ratha Yatra chariot parade followed by music, dance and Indian cultural programming."},
+ {t:"Brampton Farmers' Market — July 25",s:"2026-07-25",e:"2026-07-25",time:"8am–1pm",v:"Main Street North, Downtown Brampton",lat:43.6870,lng:-79.7613,cat:"market",url:"https://www.brampton.ca/EN/Arts-Culture-Tourism/Experience-Brampton/Dine-and-Shop/Pages/Brampton-Farmers-Market.aspx",free:true,ver:true,provider:"City of Brampton",checked:"2026-07-16",sum:"The weekly downtown market returns rain or shine with produce, food and handmade goods."},
+
+ /* York Region */
+ {t:"Vaughan International Music Festival",s:"2026-07-17",e:"2026-07-18",time:"5–11pm",v:"Assembly Park — South VMC, Vaughan",lat:43.7897,lng:-79.5295,cat:"music",url:"https://www.vaughan.ca/upcoming-events/vaughan-international-music-festival-2026",free:true,ver:true,pick:true,provider:"City of Vaughan",checked:"2026-07-16",sum:"Two free nights of Canadian rock and country artists, international food and family activities."},
+ {t:"Vaughan Concerts in the Park: Gold Dust Woman",s:"2026-07-22",e:"2026-07-22",time:"7:30–9pm",v:"Carrville District Park, Vaughan",lat:43.8580,lng:-79.4800,cat:"music",url:"https://www.vaughan.ca/residential/recreation-programs-and-fitness/events/concerts-park",free:true,ver:true,provider:"City of Vaughan",checked:"2026-07-16",sum:"A free Stevie Nicks tribute concert in the park."},
+ {t:"Vaughan Concerts in the Park: Still Rock'n Roll",s:"2026-07-29",e:"2026-07-29",time:"7:30–9pm",v:"Sonoma Heights Community Park, Vaughan",lat:43.8460,lng:-79.6530,cat:"music",url:"https://www.vaughan.ca/residential/recreation-programs-and-fitness/events/concerts-park",free:true,ver:true,provider:"City of Vaughan",checked:"2026-07-16",sum:"A free Billy Joel tribute concert in Sonoma Heights."},
+ {t:"Richmond Hill Ribfest",s:"2026-07-17",e:"2026-07-19",time:"Fri noon · weekend",v:"Richmond Green Park",lat:43.8978,lng:-79.3937,cat:"food",url:"https://calendar.richmondhill.ca/default/Detail/2026-07-17-1200-Ribfest",free:true,ver:true,pick:true,provider:"City of Richmond Hill",checked:"2026-07-16",sum:"Award-winning rib teams, live entertainment and all-ages amusement over three days."},
+ {t:"Richmond Hill Stargazing Party",s:"2026-07-20",e:"2026-07-20",time:"8:30–10:30pm",v:"David Dunlap Observatory Park",lat:43.8637,lng:-79.4223,cat:"outdoor",url:"https://calendar.richmondhill.ca/default/Detail/2026-07-20-2030-Stargazing-Party",free:true,ver:true,provider:"City of Richmond Hill",checked:"2026-07-16",sum:"Bring binoculars, a flashlight and chair for free observing on the first clear night of the week."},
+ {t:"Richmond Hill Live in the Plaza: Demi Pallas",s:"2026-07-21",e:"2026-07-21",time:"7–9pm",v:"Richmond Hill Centre outdoor plaza",lat:43.8760,lng:-79.4387,cat:"music",url:"https://www.richmondhill.ca/en/things-to-do/concerts-in-the-park.aspx",free:true,ver:true,provider:"City of Richmond Hill",checked:"2026-07-16",sum:"A free Tuesday-night performance outside the performing arts centre."},
+ {t:"Richmond Hill Concerts in the Park: Best of the 80s",s:"2026-07-23",e:"2026-07-23",time:"7–9pm",v:"Mill Pond Park, Richmond Hill",lat:43.8835,lng:-79.4461,cat:"music",url:"https://www.richmondhill.ca/en/things-to-do/concerts-in-the-park.aspx",free:true,ver:true,provider:"City of Richmond Hill",checked:"2026-07-16",sum:"George St. Kitts leads a free evening of 1980s favourites."},
+ {t:"Richmond Hill Concerts in the Park: Chicago Transit",s:"2026-07-30",e:"2026-07-30",time:"7–9pm",v:"Mill Pond Park, Richmond Hill",lat:43.8835,lng:-79.4461,cat:"music",url:"https://www.richmondhill.ca/en/things-to-do/concerts-in-the-park.aspx",free:true,ver:true,provider:"City of Richmond Hill",checked:"2026-07-16",sum:"A free tribute to the horn-driven hits of Chicago."},
+
+ /* Durham Region */
+ {t:"Pickering Summer Concert: Backstage Pass Band",s:"2026-07-17",e:"2026-07-17",time:"5:30–7:30pm",v:"Rick Johnson Memorial Park, Pickering",lat:43.8317,lng:-79.1050,cat:"music",url:"https://www.pickering.ca/parks-recreation-culture/festivals-and-events/summer-concerts/",free:true,ver:true,provider:"City of Pickering",checked:"2026-07-16",sum:"Free Friday-evening rock and pop in the park."},
+ {t:"Pickering Summer Concert: George Lake Big Band",s:"2026-07-19",e:"2026-07-19",time:"2–4pm",v:"Esplanade Park, Pickering",lat:43.8353,lng:-79.0889,cat:"music",url:"https://www.pickering.ca/parks-recreation-culture/festivals-and-events/summer-concerts/",free:true,ver:true,provider:"City of Pickering",checked:"2026-07-16",sum:"A free Sunday set of pop, jazz and swing."},
+ {t:"Pickering Waterfront Concert: Daniel Panetta",s:"2026-07-23",e:"2026-07-23",time:"7–9pm",v:"Millennium Square, Pickering",lat:43.8146,lng:-79.0836,cat:"music",url:"https://www.pickering.ca/parks-recreation-culture/festivals-and-events/summer-concerts/",free:true,ver:true,provider:"City of Pickering",checked:"2026-07-16",sum:"Free pop, Motown and R&B by the Pickering waterfront."},
+ {t:"Pickering Summer Concert: TwoForTheShow",s:"2026-07-24",e:"2026-07-24",time:"5:30–7:30pm",v:"Rick Johnson Memorial Park, Pickering",lat:43.8317,lng:-79.1050,cat:"music",url:"https://www.pickering.ca/parks-recreation-culture/festivals-and-events/summer-concerts/",free:true,ver:true,provider:"City of Pickering",checked:"2026-07-16",sum:"Free rock, pop and reggae in the park."},
+ {t:"Pickering Summer Concert: One Night Stand",s:"2026-07-26",e:"2026-07-26",time:"2–4pm",v:"Esplanade Park, Pickering",lat:43.8353,lng:-79.0889,cat:"music",url:"https://www.pickering.ca/parks-recreation-culture/festivals-and-events/summer-concerts/",free:true,ver:true,provider:"City of Pickering",checked:"2026-07-16",sum:"A free Sunday-afternoon mix of rock, pop and R&B."},
+ {t:"Pickering Waterfront Concert: The Band Excel",s:"2026-07-30",e:"2026-07-30",time:"7–9pm",v:"Millennium Square, Pickering",lat:43.8146,lng:-79.0836,cat:"music",url:"https://www.pickering.ca/parks-recreation-culture/festivals-and-events/summer-concerts/",free:true,ver:true,provider:"City of Pickering",checked:"2026-07-16",sum:"Free Caribbean and soca music beside Lake Ontario."},
+ {t:"Pickering Summer Concert: The Infrared Band",s:"2026-07-31",e:"2026-07-31",time:"5:30–7:30pm",v:"Rick Johnson Memorial Park, Pickering",lat:43.8317,lng:-79.1050,cat:"music",url:"https://www.pickering.ca/parks-recreation-culture/festivals-and-events/summer-concerts/",free:true,ver:true,provider:"City of Pickering",checked:"2026-07-16",sum:"A free Caribbean Friday-evening concert."},
+ {t:"Whitby Movies in the Park: Hoppers",s:"2026-07-17",e:"2026-07-17",time:"Dusk",v:"Whitby Civic Park",lat:43.8998,lng:-78.9414,cat:"film",url:"https://www.whitby.ca/news/posts/things-to-do-in-whitby-this-july-2026/",free:true,ver:true,provider:"Town of Whitby",checked:"2026-07-16",sum:"Free family movie night on a giant outdoor screen; bring a blanket, chair and snacks."},
+ {t:"Whitby Home Sweet Home Festival",s:"2026-07-25",e:"2026-07-25",time:"10am–4pm",v:"Downtown Whitby",lat:43.8798,lng:-78.9422,cat:"festival",url:"https://www.whitby.ca/HomeSweetHomeFestival",free:true,ver:true,pick:true,provider:"Town of Whitby",checked:"2026-07-16",sum:"A pedestrian downtown festival with an artisan market, local food, live entertainment and family activities."},
+ {t:"Whitby Waterfront Wellness",s:"2026-07-29",e:"2026-07-29",time:"6–8pm",v:"Rotary Sunrise Lake Park, Whitby",lat:43.8557,lng:-78.9327,cat:"outdoor",url:"https://www.whitby.ca/news/posts/things-to-do-in-whitby-this-july-2026/",free:true,ver:true,provider:"Town of Whitby",checked:"2026-07-16",sum:"A gentle all-levels yoga session with breathwork and sound-bath meditation by the water."},
+ {t:"Ontario Lacrosse Festival — opening day",s:"2026-07-31",e:"2026-08-09",v:"Whitby and Durham Region arenas",lat:43.8745,lng:-78.9408,cat:"community",url:"https://www.whitby.ca/news/posts/whitbys-fieldgate-sports-complex-added-as-host-venue-for-ontario-lacrosse-festival/",free:false,ver:true,provider:"Town of Whitby",checked:"2026-07-16",sum:"Ten days of youth provincial championships across sixteen Durham Region venues."},
+
+ /* Halton Region */
+ {t:"Oakville Strawberry Festival",s:"2026-07-18",e:"2026-07-18",time:"2–9pm",v:"Downtown Oakville",lat:43.4458,lng:-79.6689,cat:"festival",url:"https://visitoakville.com/events/strawberry-festival/",free:true,ver:true,pick:true,provider:"Visit Oakville",checked:"2026-07-16",sum:"Live music, dance lessons, strawberry treats, shopping and patio dining celebrate Oakville's berry-growing history."},
+ {t:"Burlington Concerts in the Park: Ana Lía",s:"2026-07-19",e:"2026-07-19",time:"7–8:30pm",v:"Central Park Bandshell, Burlington",lat:43.3575,lng:-79.7944,cat:"music",url:"https://www.burlington.ca/en/news/festivals-and-events/concerts-in-the-park.aspx",free:true,ver:true,provider:"City of Burlington",checked:"2026-07-16",sum:"A free Sunday evening of Latin music at the bandshell."},
+ {t:"Burlington Concerts in the Park: PUBLIC HOUSE",s:"2026-07-22",e:"2026-07-22",time:"7–8:30pm",v:"Central Park Bandshell, Burlington",lat:43.3575,lng:-79.7944,cat:"music",url:"https://www.burlington.ca/en/news/festivals-and-events/concerts-in-the-park.aspx",free:true,ver:true,provider:"City of Burlington",checked:"2026-07-16",sum:"Free 1960s and 70s rock and folk in Central Park."},
+ {t:"Burlington Concerts in the Park: Kendra Gabrielle",s:"2026-07-26",e:"2026-07-26",time:"7–8:30pm",v:"Central Park Bandshell, Burlington",lat:43.3575,lng:-79.7944,cat:"music",url:"https://www.burlington.ca/en/news/festivals-and-events/concerts-in-the-park.aspx",free:true,ver:true,provider:"City of Burlington",checked:"2026-07-16",sum:"A free Sunday country concert at the bandshell."},
+ {t:"Burlington Concerts in the Park: Subourbon Street",s:"2026-07-29",e:"2026-07-29",time:"7–8:30pm",v:"Central Park Bandshell, Burlington",lat:43.3575,lng:-79.7944,cat:"music",url:"https://www.burlington.ca/en/news/festivals-and-events/concerts-in-the-park.aspx",free:true,ver:true,provider:"City of Burlington",checked:"2026-07-16",sum:"A free Dixieland concert to close July's bandshell schedule."},
+
+ /* ---- San Francisco and Bay Area: official sources checked July 16, 2026 ---- */
+ /* San Francisco */
+ {t:"SFJAZZ: Lettuce",s:"2026-07-16",e:"2026-07-19",v:"SFJAZZ Center, San Francisco",lat:37.7764,lng:-122.4211,cat:"music",url:"https://www.sfjazz.org/",free:false,ver:true,pick:true,provider:"SFJAZZ",checked:"2026-07-16",sum:"Four nights of psychedelic funk from Lettuce in Miner Auditorium."},
+ {t:"SFJAZZ: Steven Bernstein's Sexmob",s:"2026-07-17",e:"2026-07-19",v:"SFJAZZ Center, San Francisco",lat:37.7764,lng:-122.4211,cat:"music",url:"https://www.sfjazz.org/",free:false,ver:true,provider:"SFJAZZ",checked:"2026-07-16",sum:"A Bay Area psych-and-soul tribute weekend in the Joe Henderson Lab."},
+ {t:"Stern Grove: Charley Crockett",s:"2026-07-19",e:"2026-07-19",v:"Sigmund Stern Recreation Grove, San Francisco",lat:37.7366,lng:-122.4771,cat:"music",url:"https://www.sterngrove.org/lineup2026",free:true,ver:true,provider:"Stern Grove Festival",checked:"2026-07-16",sum:"Free outdoor concert with Nicki Bluhm; the official page currently lists the lottery allocation as sold out."},
+ {t:"Bhangra & Beats Night Market",s:"2026-07-24",e:"2026-07-24",time:"4–9pm",v:"Yerba Buena Gardens, San Francisco",lat:37.7851,lng:-122.4024,cat:"market",url:"https://ybgfestival.org/event/bhangra-and-beats-072426/",free:true,ver:true,pick:true,provider:"Yerba Buena Gardens Festival",checked:"2026-07-16",sum:"A free South Asian night market with Bhangra dance lessons, dhol drumming, DJs, food and makers."},
+ {t:"SFJAZZ: Daniel Villarreal",s:"2026-07-23",e:"2026-07-24",v:"SFJAZZ Center, San Francisco",lat:37.7764,lng:-122.4211,cat:"music",url:"https://www.sfjazz.org/",free:false,ver:true,provider:"SFJAZZ",checked:"2026-07-16",sum:"The groundbreaking drummer performs two nights in the Joe Henderson Lab."},
+ {t:"Yerba Buena Gardens ChoreoFest",s:"2026-07-25",e:"2026-08-01",time:"Two Saturdays",v:"Yerba Buena Gardens, San Francisco",lat:37.7851,lng:-122.4024,cat:"art",url:"https://ybgfestival.org/events/",free:true,ver:true,provider:"Yerba Buena Gardens Festival",checked:"2026-07-16",sum:"Two free Saturdays of Bay Area dance and choreography in the gardens."},
+ {t:"San Francisco Marathon Weekend",s:"2026-07-25",e:"2026-07-26",v:"Embarcadero and citywide San Francisco",lat:37.7955,lng:-122.3937,cat:"outdoor",url:"https://support.thesfmarathon.com/hc/en-us",free:false,ver:true,pick:true,provider:"The San Francisco Marathon",checked:"2026-07-16",sum:"The city's marathon weekend includes full, half and shorter-distance races across San Francisco."},
+ {t:"Stern Grove: Suki Waterhouse",s:"2026-07-26",e:"2026-07-26",v:"Sigmund Stern Recreation Grove, San Francisco",lat:37.7366,lng:-122.4771,cat:"music",url:"https://www.sterngrove.org/lineup2026",free:true,ver:true,provider:"Stern Grove Festival",checked:"2026-07-16",sum:"Free outdoor concert with Charlotte Lawrence; check the official page for ticket-release options."},
+ {t:"SFJAZZ: Yilian Cañizares",s:"2026-07-26",e:"2026-07-26",v:"SFJAZZ Center, San Francisco",lat:37.7764,lng:-122.4211,cat:"music",url:"https://www.sfjazz.org/",free:false,ver:true,provider:"SFJAZZ",checked:"2026-07-16",sum:"The Cuban vocalist and violinist performs in the Joe Henderson Lab."},
+ {t:"SFJAZZ: Monsieur Periné",s:"2026-07-30",e:"2026-08-02",v:"SFJAZZ Center, San Francisco",lat:37.7764,lng:-122.4211,cat:"music",url:"https://www.sfjazz.org/",free:false,ver:true,provider:"SFJAZZ",checked:"2026-07-16",sum:"The Colombian ensemble brings four nights of tropical charm to Miner Auditorium."},
+ {t:"Jerry Day 2026",s:"2026-08-01",e:"2026-08-01",v:"Jerry Garcia Amphitheater, McLaren Park",lat:37.7186,lng:-122.4186,cat:"music",url:"https://www.jerryday.org/jerry-day-events.html",free:true,ver:true,pick:true,provider:"Jerry Day",checked:"2026-07-16",sum:"The 24th annual civic celebration of San Francisco native Jerry Garcia."},
+ {t:"Nihonmachi Street Fair",s:"2026-08-01",e:"2026-08-02",v:"Japantown, San Francisco",lat:37.7854,lng:-122.4298,cat:"festival",url:"https://www.nihonmachistreetfair.org/",free:true,ver:true,pick:true,provider:"Nihonmachi Street Fair",checked:"2026-07-16",sum:"A free weekend celebrating Asian and Pacific Islander culture, community groups, art, food and performance."},
+ {t:"Stern Grove: Violent Femmes",s:"2026-08-02",e:"2026-08-02",v:"Sigmund Stern Recreation Grove, San Francisco",lat:37.7366,lng:-122.4771,cat:"music",url:"https://www.sterngrove.org/lineup2026",free:true,ver:true,provider:"Stern Grove Festival",checked:"2026-07-16",sum:"Free outdoor concert with Tune-Yards; check the official page for ticket-release options."},
+ {t:"SFJAZZ: NYO Jazz",s:"2026-08-04",e:"2026-08-04",v:"SFJAZZ Center, San Francisco",lat:37.7764,lng:-122.4211,cat:"music",url:"https://www.sfjazz.org/",free:false,ver:true,provider:"SFJAZZ",checked:"2026-07-16",sum:"Carnegie Hall's National Youth Orchestra jazz ensemble performs in Miner Auditorium."},
+ {t:"Outside Lands Music Festival",s:"2026-08-07",e:"2026-08-09",v:"Golden Gate Park, San Francisco",lat:37.7694,lng:-122.4862,cat:"festival",url:"https://sfoutsidelands.com/info/",free:false,ver:true,pick:true,provider:"Outside Lands",checked:"2026-07-16",sum:"Three days of major music acts, local food, wine and art in Golden Gate Park."},
+ {t:"Pistahan Parade and Festival",s:"2026-08-08",e:"2026-08-09",v:"Yerba Buena Gardens, San Francisco",lat:37.7851,lng:-122.4024,cat:"festival",url:"https://www.pistahan.net/",free:true,ver:true,pick:true,provider:"Pistahan",checked:"2026-07-16",sum:"A free Filipino parade and two-day festival with art, culinary, dance, heritage and family pavilions."},
+ {t:"Stern Grove: Patti LaBelle",s:"2026-08-09",e:"2026-08-09",v:"Sigmund Stern Recreation Grove, San Francisco",lat:37.7366,lng:-122.4771,cat:"music",url:"https://www.sterngrove.org/lineup2026",free:true,ver:true,provider:"Stern Grove Festival",checked:"2026-07-16",sum:"The soul icon headlines a free outdoor concert with Destani Wolf."},
+ {t:"SFJAZZ: Take 6",s:"2026-08-13",e:"2026-08-16",v:"SFJAZZ Center, San Francisco",lat:37.7764,lng:-122.4211,cat:"music",url:"https://www.sfjazz.org/",free:false,ver:true,provider:"SFJAZZ",checked:"2026-07-16",sum:"Four nights with the Grammy-winning gospel vocal group in Miner Auditorium."},
+ {t:"Stern Grove: Public Enemy",s:"2026-08-15",e:"2026-08-15",v:"Sigmund Stern Recreation Grove, San Francisco",lat:37.7366,lng:-122.4771,cat:"music",url:"https://www.sterngrove.org/lineup2026",free:true,ver:true,pick:true,provider:"Stern Grove Festival",checked:"2026-07-16",sum:"A free Saturday concert with LaRussell; general-admission tickets use a lottery."},
+ {t:"Stern Grove: Al Green",s:"2026-08-16",e:"2026-08-16",v:"Sigmund Stern Recreation Grove, San Francisco",lat:37.7366,lng:-122.4771,cat:"music",url:"https://www.sterngrove.org/lineup2026",free:true,ver:true,pick:true,provider:"Stern Grove Festival",checked:"2026-07-16",sum:"The season finale pairs Al Green with Goapele and The Glide Ensemble; tickets use a lottery."},
+
+ /* Bay Area and approximately three hours from San Francisco */
+ {t:"Mosswood Meltdown",s:"2026-07-17",e:"2026-07-19",v:"Mosswood Park, Oakland",lat:37.8241,lng:-122.2609,cat:"festival",url:"https://mosswoodmeltdown.com/about/",free:false,ver:true,pick:true,provider:"Mosswood Meltdown",checked:"2026-07-16",sum:"A pre-party and two-day punk, garage and alternative music festival in Oakland."},
+ {t:"NORCECA Girls U19 Volleyball Championship",s:"2026-07-17",e:"2026-07-25",v:"San José, California",lat:37.3382,lng:-121.8863,cat:"community",url:"https://usavolleyball.org/event/2026-norceca-girls-u19-pan-american-cup/",free:false,ver:true,provider:"USA Volleyball",checked:"2026-07-16",sum:"International under-19 women's volleyball competition hosted in San José."},
+ {t:"Festival Napa Valley — closing weekend",s:"2026-07-16",e:"2026-07-19",v:"Venues across Napa Valley",lat:38.2975,lng:-122.2869,cat:"music",url:"https://festivalnapavalley.org/",free:false,ver:true,provider:"Festival Napa Valley",checked:"2026-07-16",sum:"The 20th-anniversary festival closes with music, opera, food, wine and arts programming."},
+ {t:"California Rodeo Salinas",s:"2026-07-16",e:"2026-07-19",v:"Salinas Sports Complex",lat:36.6966,lng:-121.6516,cat:"community",url:"https://www.carodeo.com/",free:false,ver:true,provider:"California Rodeo Salinas",checked:"2026-07-16",sum:"Four days of professional rodeo competition and western entertainment in Salinas."},
+ {t:"California State Fair",s:"2026-07-17",e:"2026-08-01",v:"Cal Expo, Sacramento",lat:38.5936,lng:-121.4340,cat:"festival",url:"https://castatefair.com/fair-hours/",free:false,ver:true,pick:true,provider:"California State Fair",checked:"2026-07-16",sum:"California's statewide summer fair brings exhibits, concerts, food, agriculture and carnival rides to Cal Expo."},
+ {t:"San José Music in the Park",s:"2026-07-24",e:"2026-07-26",v:"Plaza de César Chávez, San José",lat:37.3328,lng:-121.8892,cat:"music",url:"https://www.sanjose.org/summer",free:false,ver:true,provider:"Visit San José",checked:"2026-07-16",sum:"Downtown San José's summer concert weekend returns to Plaza Park."},
+ {t:"Moss Landing Street Fair",s:"2026-07-26",e:"2026-07-26",v:"Moss Landing, Monterey County",lat:36.8044,lng:-121.7869,cat:"market",url:"https://www.seemonterey.com/events/annual-events/",free:true,ver:true,provider:"See Monterey",checked:"2026-07-16",sum:"A coastal street fair with antiques, art, food and community vendors."},
+ {t:"Santa Cruz Shakespeare Summer Festival",s:"2026-07-16",e:"2026-08-16",v:"Audrey Stanley Grove, Santa Cruz",lat:36.9955,lng:-121.9992,cat:"theater",url:"https://santacruzshakespeare.org/2026/04/28/tickets-on-sale-may-1-for-santa-cruz-shakespeares-2026-festival-season/",free:false,ver:true,provider:"Santa Cruz Shakespeare",checked:"2026-07-16",sum:"Much Ado About Nothing, Macbeth and Fences rotate in an outdoor repertory season."},
+ {t:"Cabrillo Festival of Contemporary Music",s:"2026-07-26",e:"2026-08-09",v:"Santa Cruz Civic Auditorium and area venues",lat:36.9740,lng:-122.0290,cat:"music",url:"https://cabrillomusic.org/2026-season/",free:false,ver:true,pick:true,provider:"Cabrillo Festival",checked:"2026-07-16",sum:"The 64th season presents contemporary orchestral music, open rehearsals and community programs."},
+ {t:"San José Community Hoop Festival",s:"2026-08-01",e:"2026-08-02",v:"Downtown San José",lat:37.3350,lng:-121.8890,cat:"community",url:"https://www.sanjose.org/summer",free:true,ver:true,provider:"Visit San José",checked:"2026-07-16",sum:"A free downtown basketball and community celebration weekend."},
+ {t:"Oakland First Fridays",s:"2026-08-07",e:"2026-08-07",v:"Telegraph Avenue, Oakland",lat:37.8160,lng:-122.2673,cat:"art",url:"https://www.oaklandfirstfridays.org/",free:true,ver:true,provider:"Oakland First Fridays",checked:"2026-07-16",sum:"Oakland's free monthly street festival celebrates art, food, music and local creativity."},
+ {t:"San José Jazz Summer Fest",s:"2026-08-07",e:"2026-08-09",v:"Plaza de César Chávez and downtown San José",lat:37.3328,lng:-121.8892,cat:"music",url:"https://www.sanjose.org/events/san-jose-jazz-summer-fest-2026",free:false,ver:true,pick:true,provider:"Visit San José",checked:"2026-07-16",sum:"Three days of jazz, R&B, Latin, funk and global music across downtown stages."},
+ {t:"Sonoma County Fair",s:"2026-08-07",e:"2026-08-16",v:"Sonoma County Fairgrounds, Santa Rosa",lat:38.4321,lng:-122.7022,cat:"festival",url:"https://sonomacountyfair.com/pages/sonoma-county-fair-calendar",free:false,ver:true,provider:"Sonoma County Fair",checked:"2026-07-16",sum:"A ten-day county fair with agriculture, exhibits, entertainment, food and rides."},
+ {t:"Monterey Car Week",s:"2026-08-07",e:"2026-08-16",v:"Monterey Peninsula",lat:36.6002,lng:-121.8947,cat:"festival",url:"https://www.seemonterey.com/car-week-2026-preview/",free:false,ver:true,pick:true,provider:"See Monterey",checked:"2026-07-16",sum:"Ten days of car shows, rallies, auctions, historic racing and unveilings across the Monterey Peninsula."},
+ {t:"Monterey Pre-Reunion & Corkscrew Hillclimb",s:"2026-08-08",e:"2026-08-09",v:"WeatherTech Raceway Laguna Seca",lat:36.5842,lng:-121.7534,cat:"community",url:"https://www.seemonterey.com/car-week-races-drives/",free:false,ver:true,provider:"See Monterey",checked:"2026-07-16",sum:"Historic race cars compete before the main Motorsports Reunion and tackle the Corkscrew hillclimb."},
+ {t:"Laurel StreetFair World Music Festival",s:"2026-08-08",e:"2026-08-08",v:"Laurel District, Oakland",lat:37.7913,lng:-122.1967,cat:"festival",url:"https://www.visitoakland.com/blog/post/events-to-attend-in-oakland-this-summer/",free:true,ver:true,provider:"Visit Oakland",checked:"2026-07-16",sum:"The 25th annual Laurel StreetFair brings world music, food, art and community to MacArthur Boulevard."},
+ {t:"Rolex Monterey Motorsports Reunion",s:"2026-08-12",e:"2026-08-15",v:"WeatherTech Raceway Laguna Seca",lat:36.5842,lng:-121.7534,cat:"community",url:"https://www.seemonterey.com/car-week-races-drives/",free:false,ver:true,provider:"See Monterey",checked:"2026-07-16",sum:"Four days of historic racing during Monterey Car Week."},
+ {t:"Oakland Pride Parade & Festival",s:"2026-08-16",e:"2026-08-16",v:"Downtown Oakland",lat:37.8044,lng:-122.2712,cat:"festival",url:"https://www.oaklandprideofficial.org/",free:true,ver:true,pick:true,provider:"Oakland Pride",checked:"2026-07-16",sum:"A downtown parade and festival celebrating Oakland's LGBTQ+ community, culture and creativity."},
+ {t:"Pebble Beach Concours d'Elegance",s:"2026-08-16",e:"2026-08-16",v:"Pebble Beach Golf Links",lat:36.5696,lng:-121.9499,cat:"community",url:"https://www.pebblebeach.com/events/",free:false,ver:true,pick:true,provider:"Pebble Beach Resorts",checked:"2026-07-16",sum:"The culminating Car Week showcase presents significant collector automobiles on the 18th fairway."},
+
+ /* ---- Los Angeles and approximately three hours away: official sources checked July 16, 2026 ---- */
+ /* Los Angeles */
+ {t:"LACMA Third Weekend — July",s:"2026-07-16",e:"2026-07-19",v:"LACMA, Los Angeles",lat:34.0638,lng:-118.3590,cat:"art",url:"https://www.lacma.org/third-weekends",free:true,ver:true,pick:true,provider:"LACMA",checked:"2026-07-16",sum:"Four days of free and low-cost talks, workshops, film, jazz, Latin music, movement and family art."},
+ {t:"Jazz at LACMA: Ray Fuller Band",s:"2026-07-17",e:"2026-07-17",time:"6pm",v:"LACMA, Los Angeles",lat:34.0638,lng:-118.3590,cat:"music",url:"https://www.lacma.org/third-weekends",free:true,ver:true,provider:"LACMA",checked:"2026-07-16",sum:"A free Friday evening jazz performance during LACMA's Third Weekend."},
+ {t:"Grand Performances Summer Concerts",s:"2026-07-17",e:"2026-08-15",v:"California Plaza, Downtown Los Angeles",lat:34.0523,lng:-118.2500,cat:"music",url:"https://www.grandperformances.org/",free:true,ver:true,pick:true,provider:"Grand Performances",checked:"2026-07-16",sum:"Free outdoor music, dance, poetry and cultural performances in downtown Los Angeles."},
+ {t:"Levitt Pavilion LA Summer Concerts",s:"2026-07-17",e:"2026-08-16",v:"MacArthur Park, Los Angeles",lat:34.0607,lng:-118.2774,cat:"music",url:"https://levitt.org/los-angeles/",free:true,ver:true,provider:"Levitt Foundation",checked:"2026-07-16",sum:"Free live music in MacArthur Park as part of Levitt Los Angeles' June-through-August season."},
+ {t:"Cinespia Summer Screenings",s:"2026-07-18",e:"2026-08-16",v:"Hollywood Forever and Los Angeles venues",lat:34.0890,lng:-118.3191,cat:"film",url:"https://cinespia.org/",free:false,ver:true,provider:"Cinespia",checked:"2026-07-16",sum:"Outdoor films, DJs and themed photo booths at Hollywood Forever and other landmark venues."},
+ {t:"West Harbor World Cup Final Weekend",s:"2026-07-18",e:"2026-07-19",v:"West Harbor, San Pedro",lat:33.7367,lng:-118.2784,cat:"community",url:"https://portoflosangeles.org/references/2026-news-releases/news_061026_summer_events",free:false,ver:true,provider:"Port of Los Angeles",checked:"2026-07-16",sum:"Official fan-zone broadcasts with soccer activities, food, drinks and a live DJ."},
+ {t:"SIGGRAPH 2026",s:"2026-07-19",e:"2026-07-23",v:"Los Angeles Convention Center",lat:34.0403,lng:-118.2698,cat:"art",url:"https://www.laconventioncenter.com/events",free:false,ver:true,pick:true,provider:"Los Angeles Convention Center",checked:"2026-07-16",sum:"The international computer graphics and interactive-tech conference brings talks, art and emerging technology to LA."},
+ {t:"Shakespeare by the Sea — touring season",s:"2026-07-16",e:"2026-07-25",v:"Parks across Los Angeles and Orange counties",lat:33.7291,lng:-118.2847,cat:"theater",url:"https://shakespearebythesea.org/",free:true,ver:true,provider:"Shakespeare by the Sea",checked:"2026-07-16",sum:"Admission-free outdoor Shakespeare tours twelve Southern California locations."},
+ {t:"Afro-Latino Culture Fest",s:"2026-08-01",e:"2026-08-01",v:"LA Plaza de Cultura y Artes",lat:34.0576,lng:-118.2398,cat:"festival",url:"https://www.discoverlosangeles.com/things-to-do/coming-soon-the-best-of-los-angeles",free:true,ver:true,pick:true,provider:"Discover Los Angeles",checked:"2026-07-16",sum:"A free family festival with Afro-Latino and Afro-Caribbean music, DJs, food and cultural activities."},
+ {t:"Collect-A-Con Los Angeles",s:"2026-08-01",e:"2026-08-02",v:"Los Angeles Convention Center",lat:34.0403,lng:-118.2698,cat:"market",url:"https://www.laconventioncenter.com/events",free:false,ver:true,provider:"Los Angeles Convention Center",checked:"2026-07-16",sum:"A weekend of trading cards, anime, pop-culture collectibles, special guests and live entertainment."},
+ {t:"Los Angeles Jazz Festival — opening week",s:"2026-08-08",e:"2026-08-16",v:"Parks and public spaces across Los Angeles",lat:34.0522,lng:-118.2437,cat:"music",url:"https://lacity.gov/news/first-ever-los-angeles-jazz-festival-announced-summer-2026",free:true,ver:true,pick:true,provider:"City of Los Angeles",checked:"2026-07-16",sum:"The inaugural citywide festival opens with free jazz concerts in public spaces across LA."},
+ {t:"KCON LA 2026",s:"2026-08-13",e:"2026-08-16",v:"Los Angeles Convention Center",lat:34.0403,lng:-118.2698,cat:"festival",url:"https://www.laconventioncenter.com/events",free:false,ver:true,pick:true,provider:"Los Angeles Convention Center",checked:"2026-07-16",sum:"Four days of K-pop concerts, artist appearances, panels, dance and fan experiences."},
+ {t:"LACMA Third Weekend — August",s:"2026-08-13",e:"2026-08-16",v:"LACMA, Los Angeles",lat:34.0638,lng:-118.3590,cat:"art",url:"https://www.lacma.org/third-weekends",free:true,ver:true,provider:"LACMA",checked:"2026-07-16",sum:"Talks, jazz, film, chess, drawing, meditation and family programs; many are free with RSVP."},
+ {t:"San Pedro Pride Festival",s:"2026-08-15",e:"2026-08-15",time:"4–10pm",v:"AltaSea at the Port of Los Angeles",lat:33.7264,lng:-118.2638,cat:"festival",url:"https://portoflosangeles.org/references/2026-news-releases/news_061026_summer_events",free:true,ver:true,provider:"Port of Los Angeles",checked:"2026-07-16",sum:"A free waterfront festival celebrating love, diversity and the South Bay community."},
+
+ /* Orange County, Ventura, Palm Springs and San Diego */
+ {t:"OC Fair",s:"2026-07-17",e:"2026-08-16",v:"OC Fair & Event Center, Costa Mesa",lat:33.6659,lng:-117.9026,cat:"festival",url:"https://ocfair.com/oc-fair/general-information",free:false,ver:true,pick:true,provider:"OC Fair",checked:"2026-07-16",sum:"The month-long Orange County Fair features food, rides, concerts, exhibits, animals and arena events."},
+ {t:"Sawdust Art Festival",s:"2026-07-16",e:"2026-08-16",v:"Sawdust Art Festival grounds, Laguna Beach",lat:33.5535,lng:-117.7698,cat:"art",url:"https://tickets.sawdustartfestival.org/",free:false,ver:true,provider:"Sawdust Art Festival",checked:"2026-07-16",sum:"More than a hundred Laguna Beach artists present work, demonstrations, classes and live entertainment."},
+ {t:"Pageant of the Masters",s:"2026-07-16",e:"2026-08-16",v:"Festival of Arts, Laguna Beach",lat:33.5428,lng:-117.7821,cat:"theater",url:"https://www.foapom.com/pageant-of-the-masters/",free:false,ver:true,pick:true,provider:"Festival of Arts",checked:"2026-07-16",sum:"Nightly living-picture performances recreate art masterpieces in an outdoor amphitheatre."},
+ {t:"Del Mar Summer Racing Season",s:"2026-07-17",e:"2026-08-16",v:"Del Mar Racetrack",lat:32.9754,lng:-117.2611,cat:"community",url:"https://web.dmtc.com/season",free:false,ver:true,provider:"Del Mar Thoroughbred Club",checked:"2026-07-16",sum:"Opening Day begins an eight-week season of live thoroughbred racing and trackside events."},
+ {t:"San Diego Pride Parade & Festival",s:"2026-07-18",e:"2026-07-19",v:"Hillcrest and Balboa Park, San Diego",lat:32.7341,lng:-117.1446,cat:"festival",url:"https://sdpride.org/pride/",free:false,ver:true,pick:true,provider:"San Diego Pride",checked:"2026-07-16",sum:"A major Pride parade and two-day festival with music, community organizations and food."},
+ {t:"Comic-Con International 2026",s:"2026-07-23",e:"2026-07-26",v:"San Diego Convention Center",lat:32.7067,lng:-117.1612,cat:"festival",url:"https://www.sdccc.org/calendar",free:false,ver:true,pick:true,provider:"San Diego Convention Center",checked:"2026-07-16",sum:"Four days of comics, film, television, games, cosplay, panels and exhibitions in downtown San Diego."},
+ {t:"Ventura County Fair",s:"2026-07-29",e:"2026-08-09",time:"Noon–11pm",v:"Ventura County Fairgrounds",lat:34.2764,lng:-119.2994,cat:"festival",url:"https://venturacountyfair.org/fair/hours-and-days/",free:false,ver:true,pick:true,provider:"Ventura County Fair",checked:"2026-07-16",sum:"A seaside county fair with rides, food, exhibits, free-with-admission concerts and rodeo."},
+ {t:"La Jolla Music Society SummerFest",s:"2026-07-31",e:"2026-08-16",v:"The Conrad and La Jolla venues",lat:32.8430,lng:-117.2740,cat:"music",url:"https://www.ljms.org/summerfest/",free:false,ver:true,provider:"La Jolla Music Society",checked:"2026-07-16",sum:"The 40th-anniversary chamber-music festival brings leading artists to La Jolla."},
+ {t:"Palm Springs VillageFest — next-month Thursdays",s:"2026-07-16",e:"2026-08-13",time:"Thursday evenings",v:"Palm Canyon Drive, Palm Springs",lat:33.8240,lng:-116.5467,cat:"market",url:"https://www.palmsprings.com/events/month/2026-08/",free:true,ver:true,provider:"PalmSprings.com",checked:"2026-07-16",sum:"Downtown Palm Canyon Drive closes for the weekly street market with food, art, music and local vendors."},
+ {t:"Distant Worlds: Music from Final Fantasy",s:"2026-07-17",e:"2026-07-17",v:"The Rady Shell at Jacobs Park, San Diego",lat:32.7047,lng:-117.1659,cat:"music",url:"https://www.sandiegosymphony.org/media/2ccpc1ya/san-diego-symphony-2026-summer-season-announce.pdf",free:false,ver:true,provider:"San Diego Symphony",checked:"2026-07-16",sum:"The San Diego Symphony performs orchestral music from the Final Fantasy game series on the bay."},
+ {t:"Tedeschi Trucks Band",s:"2026-08-16",e:"2026-08-16",v:"The Rady Shell at Jacobs Park, San Diego",lat:32.7047,lng:-117.1659,cat:"music",url:"https://www.sandiegosymphony.org/media/2ccpc1ya/san-diego-symphony-2026-summer-season-announce.pdf",free:false,ver:true,provider:"San Diego Symphony",checked:"2026-07-16",sum:"The blues-rock ensemble closes this map's next-month window at the Rady Shell."},
 ];
 const slug = t=>t.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"").slice(0,40);
 EVENTS.forEach((ev,i)=>{ ev._id=slug(ev.t); ev.sv=5+(i*7)%38+(ev.free?6:0); });
-const saved = new Set();
+const EMBEDDED_EVENTS=EVENTS.map(ev=>({...ev}));
+const saved = new Set(Array.isArray(PERSISTED.saved)?PERSISTED.saved:[]);
 
 /* ============ state ============ */
 const state = {
-  range:{s:"2026-07-15",e:"2026-07-22"}, rangeKey:"week", day:null,
-  drive:3, cats:new Set(Object.keys(CATS)), freeOnly:false,
-  sort:"date", bounds:null, userEvents:[], activeId:null, markerMode:"icons", listMode:"day",
-  home:{name:"Seattle",lat:47.6062,lng:-122.3321},
+  range:{s:TODAY,e:addDays(TODAY,7)}, rangeKey:"week", day:null,
+  drive:Number.isInteger(PERSISTED.drive)?PERSISTED.drive:3,
+  cats:new Set(Array.isArray(PERSISTED.cats)?PERSISTED.cats:Object.keys(CATS)), freeOnly:!!PERSISTED.freeOnly,
+  sort:PERSISTED.sort||"date", bounds:null,
+  userEvents:Array.isArray(PERSISTED.userEvents)?PERSISTED.userEvents:[], activeId:null,
+  query:"",quickOutdoor:false,
+  markerMode:PERSISTED.markerMode||"icons", listMode:PERSISTED.listMode||"day",
+  home:PERSISTED.home&&Number.isFinite(PERSISTED.home.lat)?PERSISTED.home:{name:"Seattle",lat:47.6062,lng:-122.3321},
 };
 const KM=(a,b,c,d)=>{const R=6371,r=Math.PI/180,dLa=(c-a)*r,dLo=(d-b)*r,x=Math.sin(dLa/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(x));};
 const bandOf=ev=>{const k=KM(state.home.lat,state.home.lng,ev.lat,ev.lng);return k<30?0:k<95?1:k<190?2:k<300?3:4;};
 
 /* ============ map ============ */
-const map = L.map("map",{zoomControl:false}).setView([47.61,-122.33],10);
+const map = L.map("map",{zoomControl:false}).setView([state.home.lat,state.home.lng],10);
 L.control.zoom({position:"bottomright"}).addTo(map);
 const darkTiles=L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:'&copy; OpenStreetMap contributors &copy; CARTO',maxZoom:19});
 const lightTiles=L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{attribution:'&copy; OpenStreetMap contributors &copy; CARTO',maxZoom:19});
@@ -618,14 +860,21 @@ function makeIcon(ev){
   if(state.markerMode==="labels" && map.getZoom()>=9){
     const short = esc(ev.t.length>22 ? ev.t.slice(0,21)+"…" : ev.t);
     return L.divIcon({className:"",html:
-      `<div class="mpill ${ev.free?"free":""}" style="--c:${c.raw};${priv?"border-style:dashed;border-color:#8b5cf6":""}"><i>${c.e}</i>${short}</div>`,
+      `<div class="mpill ${ev.free?"free":""}" style="--c:${c.raw};${priv?"border-style:dashed;border-color:#8b5cf6":""}"><i>${catIcon(ev.cat)}</i>${short}</div>`,
       iconSize:null,iconAnchor:[16,16],popupAnchor:[40,-10]});
   }
   return L.divIcon({className:"",html:
-    `<div class="cpin ${priv?"private":""}" style="--c:${c.raw}"><span>${c.e}</span>${ev.sv?`<i>+${(ev.sv||0)+(saved.has(ev._id)?1:0)}</i>`:""}</div>`,
+    `<div class="cpin ${priv?"private":""}" style="--c:${c.raw}"><span>${catIcon(ev.cat)}</span>${ev.sv?`<i>+${(ev.sv||0)+(saved.has(ev._id)?1:0)}</i>`:""}</div>`,
     iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-22]});
 }
-map.on("zoomend",()=>markers.forEach(m=>m.setIcon(makeIcon(m._ev))));
+function makeGroupIcon(group){
+  const ev=group[0],c=CATS[ev.cat];
+  return L.divIcon({className:"",html:
+    `<div class="cpin" style="--c:${c.raw}"><span>${catIcon(ev.cat)}</span><i>${group.length}</i></div>`,
+    iconSize:[38,38],iconAnchor:[19,19],popupAnchor:[0,-22]});
+}
+const iconForMarker=m=>m._group&&m._group.length>1?makeGroupIcon(m._group):makeIcon(m._ev);
+map.on("zoomend",()=>markers.forEach(m=>m.setIcon(iconForMarker(m))));
 map.on("movestart",()=>{userMoved=true});
 map.on("moveend",()=>{ if(userMoved) $("#searchArea").classList.add("show"); });
 $("#searchArea").addEventListener("click",()=>{
@@ -654,8 +903,16 @@ const PLACES=[
  {n:"Leavenworth",lat:47.5962,lng:-120.6615,z:12},{n:"Snoqualmie",lat:47.5287,lng:-121.8254,z:12},
  {n:"Portland, OR",lat:45.5152,lng:-122.6784,z:11,m:1},{n:"Vancouver, BC",lat:49.2827,lng:-123.1207,z:11,m:1},
  {n:"New York City",lat:40.7128,lng:-74.0060,z:11,m:1},{n:"Brooklyn",lat:40.6782,lng:-73.9442,z:12},
- {n:"Los Angeles",lat:34.0522,lng:-118.2437,z:10,m:1},{n:"San Francisco",lat:37.7749,lng:-122.4194,z:11,m:1},
- {n:"San Diego",lat:32.7157,lng:-117.1611,z:11,m:1},{n:"Las Vegas",lat:36.1699,lng:-115.1398,z:11,m:1},
+ {n:"Los Angeles Region · 3-hour",lat:34.0522,lng:-118.2437,z:7,m:1,wide:1},{n:"Los Angeles",lat:34.0522,lng:-118.2437,z:10,m:1},
+ {n:"Inglewood",lat:33.9617,lng:-118.3531,z:11},{n:"Long Beach",lat:33.7701,lng:-118.1937,z:11},
+ {n:"Anaheim",lat:33.8366,lng:-117.9143,z:11},{n:"Costa Mesa",lat:33.6411,lng:-117.9187,z:11},
+ {n:"Laguna Beach",lat:33.5427,lng:-117.7854,z:11},{n:"Ventura",lat:34.2805,lng:-119.2945,z:11},
+ {n:"Palm Springs",lat:33.8303,lng:-116.5453,z:11},{n:"San Diego",lat:32.7157,lng:-117.1611,z:11,m:1},
+ {n:"San Francisco Bay Area · 3-hour",lat:37.7749,lng:-122.4194,z:7,m:1,wide:1},{n:"San Francisco",lat:37.7749,lng:-122.4194,z:11,m:1},
+ {n:"Oakland",lat:37.8044,lng:-122.2712,z:11},{n:"Berkeley",lat:37.8715,lng:-122.2730,z:11},
+ {n:"Napa",lat:38.2975,lng:-122.2869,z:11},{n:"Santa Rosa",lat:38.4405,lng:-122.7144,z:11},
+ {n:"Santa Cruz",lat:36.9741,lng:-122.0308,z:11},{n:"Monterey",lat:36.6002,lng:-121.8947,z:11},
+ {n:"Salinas",lat:36.6777,lng:-121.6555,z:11},{n:"Las Vegas",lat:36.1699,lng:-115.1398,z:11,m:1},
  {n:"Phoenix",lat:33.4484,lng:-112.0740,z:11,m:1},{n:"Salt Lake City",lat:40.7608,lng:-111.8910,z:11,m:1},
  {n:"Denver",lat:39.7392,lng:-104.9903,z:11,m:1},{n:"Austin",lat:30.2672,lng:-97.7431,z:11,m:1},
  {n:"Dallas",lat:32.7767,lng:-96.7970,z:11,m:1},{n:"Houston",lat:29.7604,lng:-95.3698,z:11,m:1},
@@ -664,7 +921,13 @@ const PLACES=[
  {n:"New Orleans",lat:29.9511,lng:-90.0715,z:11,m:1},{n:"Atlanta",lat:33.7490,lng:-84.3880,z:11,m:1},
  {n:"Miami",lat:25.7617,lng:-80.1918,z:11,m:1},{n:"Washington, DC",lat:38.9072,lng:-77.0369,z:11,m:1},
  {n:"Philadelphia",lat:39.9526,lng:-75.1652,z:11,m:1},{n:"Boston",lat:42.3601,lng:-71.0589,z:11,m:1},
- {n:"Toronto",lat:43.6532,lng:-79.3832,z:11,m:1},{n:"Ottawa",lat:45.4215,lng:-75.6972,z:11,m:1},
+ {n:"Greater Toronto Area",lat:43.7001,lng:-79.5000,z:9,m:1,wide:1},{n:"Toronto",lat:43.6532,lng:-79.3832,z:11,m:1},
+ {n:"Mississauga",lat:43.5890,lng:-79.6441,z:11,m:1},{n:"Brampton",lat:43.7315,lng:-79.7624,z:11,m:1},
+ {n:"Vaughan",lat:43.8372,lng:-79.5083,z:11,m:1},{n:"Markham",lat:43.8561,lng:-79.3370,z:11,m:1},
+ {n:"Richmond Hill",lat:43.8828,lng:-79.4403,z:11,m:1},{n:"Pickering",lat:43.8384,lng:-79.0868,z:11,m:1},
+ {n:"Ajax",lat:43.8509,lng:-79.0204,z:11,m:1},{n:"Whitby",lat:43.8975,lng:-78.9429,z:11,m:1},
+ {n:"Oakville",lat:43.4675,lng:-79.6877,z:11,m:1},{n:"Burlington",lat:43.3255,lng:-79.7990,z:11,m:1},
+ {n:"Ottawa",lat:45.4215,lng:-75.6972,z:11,m:1},
  {n:"Montréal",lat:45.5019,lng:-73.5674,z:11,m:1},{n:"Calgary",lat:51.0447,lng:-114.0719,z:11,m:1},
  {n:"Edmonton",lat:53.5461,lng:-113.4938,z:11,m:1},{n:"Mexico City",lat:19.4326,lng:-99.1332,z:11,m:1},
  {n:"Guadalajara",lat:20.6597,lng:-103.3496,z:11,m:1},{n:"Monterrey",lat:25.6866,lng:-100.3161,z:11,m:1},
@@ -697,6 +960,7 @@ const nearestMetro=(lat,lng)=>PLACES.filter(p=>p.m).reduce((b,p)=>KM(lat,lng,p.l
 function setHome(name,lat,lng){
   state.home={name,lat,lng};
   const hn=$("#homeName"); if(hn) hn.textContent=name;
+  persist();
 }
 const sWrap=$("#searchWrap"), sInput=$("#searchInput"), sugg=$("#sugg");
 $("#searchBtn").addEventListener("click",()=>{
@@ -707,13 +971,18 @@ $("#searchBtn").addEventListener("click",()=>{
 function goPlace(p){
   sWrap.classList.remove("open"); sugg.classList.remove("show"); sInput.value="";
   setHome(p.n,p.lat,p.lng);
+  state.bounds=null;$("#areaChip").style.display="none";
+  if(p.wide){
+    state.drive=3;state.rangeKey="extended";state.range=RANGES.extended;state.day=null;
+    $$('[data-drive]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.drive==="3")));
+    $$('[data-range]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.range==="extended")));
+    syncQuickUI();persist();
+  }
   userMoved=false;
   map.flyTo([p.lat,p.lng],p.z,{duration:.8});
   setTimeout(()=>{
-    state.bounds=map.getBounds();
-    $("#areaChip").style.display="inline-block";
     $("#searchArea").classList.remove("show");
-    userMoved=false; render();
+    userMoved=false; render(); loadNearbyEvents();
   },900);
   toast("Showing "+p.n);
 }
@@ -723,8 +992,8 @@ sInput.addEventListener("input",()=>{
   const pl=PLACES.filter(p=>p.n.toLowerCase().includes(q)).slice(0,5);
   const evs=EVENTS.filter(ev=>ev.t.toLowerCase().includes(q)||ev.v.toLowerCase().includes(q)).slice(0,4);
   if(!pl.length&&!evs.length){ sugg.innerHTML='<div class="st">No matches — try a nearby city</div>'; sugg.classList.add("show"); return; }
-  sugg.innerHTML=(pl.length?'<div class="st">Places</div>'+pl.map((p,i)=>`<button data-pl="${i}">📍 ${p.n}</button>`).join(""):"")
-    +(evs.length?'<div class="st">Events</div>'+evs.map(ev=>`<button data-ev="${ev._id}">${CATS[ev.cat].e} ${esc(ev.t)}</button>`).join(""):"");
+  sugg.innerHTML=(pl.length?'<div class="st">Places</div>'+pl.map((p,i)=>`<button data-pl="${i}"><span class="material-symbols-rounded" aria-hidden="true">location_on</span> ${p.n}</button>`).join(""):"")
+    +(evs.length?'<div class="st">Events</div>'+evs.map(ev=>`<button data-ev="${ev._id}">${catIcon(ev.cat)} ${esc(ev.t)}</button>`).join(""):"");
   sugg.classList.add("show");
   sugg.querySelectorAll("[data-pl]").forEach(b=>b.onclick=()=>goPlace(pl[+b.dataset.pl]));
   sugg.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{
@@ -739,19 +1008,19 @@ sInput.addEventListener("keydown",e=>{ if(e.key==="Escape"){ sWrap.classList.rem
 let youMarker=null;
 function setYou(lat,lng){
   const met=nearestMetro(lat,lng);
-  setHome(met.n,met.lat,met.lng);
+  setHome(met.n,lat,lng);
   if(youMarker) youMarker.setLatLng([lat,lng]);
   else youMarker=L.marker([lat,lng],{icon:L.divIcon({className:"",html:'<div class="youdot"></div>',iconSize:[16,16],iconAnchor:[8,8]}),interactive:false,zIndexOffset:1000}).addTo(map);
   userMoved=false;
   map.flyTo([lat,lng],12,{duration:.7});
   setTimeout(()=>{userMoved=false;$("#searchArea").classList.remove("show")},800);
-  render();
+  render();loadNearbyEvents();
 }
 function locateOnce(silent){
-  const fallback=()=>{ setYou(47.6062,-122.3321); if(!silent) toast("Couldn't get your location — using downtown Seattle for the demo."); };
+  const fallback=()=>{ if(!silent) toast("Location wasn't available. You can still search for a city."); };
   if(!navigator.geolocation){ fallback(); return; }
   navigator.geolocation.getCurrentPosition(
-    p=>{ setYou(p.coords.latitude,p.coords.longitude); state.sort="near"; $("#sortSel").value="near"; render(); if(!silent) toast("Centered on you 📍"); },
+    p=>{ setYou(p.coords.latitude,p.coords.longitude); state.sort="near"; $("#sortSel").value="near"; render(); if(!silent) toast("Centered on your location"); },
     fallback, {timeout:4000,maximumAge:60000});
 }
 $("#nearBtn").addEventListener("click",()=>locateOnce(false));
@@ -761,14 +1030,15 @@ function setMarkerMode(m){
   state.markerMode=m;
   $("#segLabels").setAttribute("aria-pressed",String(m==="labels"));
   $("#segIcons").setAttribute("aria-pressed",String(m==="icons"));
-  markers.forEach(mk=>mk.setIcon(makeIcon(mk._ev)));
+  markers.forEach(mk=>mk.setIcon(iconForMarker(mk)));
+  persist();
 }
 $("#segLabels").addEventListener("click",()=>setMarkerMode("labels"));
 $("#segIcons").addEventListener("click",()=>setMarkerMode("icons"));
 $$("[data-lmode]").forEach(b=>b.addEventListener("click",()=>{
   state.listMode=b.dataset.lmode;
   $$("[data-lmode]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
-  render();
+  persist(); render();
 }));
 
 /* ============ theme ============ */
@@ -776,16 +1046,58 @@ $("#themeToggle").addEventListener("click",()=>{
   const light=document.body.classList.toggle("light");
   $("#iconSun").style.display=light?"none":"block";
   $("#iconMoon").style.display=light?"block":"none";
+  $("#themeGlyph").textContent=light?"dark_mode":"light_mode";
   $('meta[name="theme-color"]').setAttribute("content",light?"#f4f5f8":"#0b0e14");
   if(light){map.removeLayer(darkTiles);lightTiles.addTo(map);}
   else{map.removeLayer(lightTiles);darkTiles.addTo(map);}
+  persist();
 });
 
 /* ============ filtering & sort ============ */
+const LIVE_RADIUS_MILES=[20,60,120,185];
+const STATIC_GITHUB_EDITION=true;
+let liveRequestId=0,liveSearchTimer=null;
+function setSourceNote(text,stateName=""){
+  const note=$("#sourceNote");if(!note)return;note.textContent=text;note.className="live-note"+(stateName?" "+stateName:"");
+}
+async function loadNearbyEvents({quiet=false}={}){
+  /* GitHub Pages is a static host, so this edition uses its embedded verified collection. */
+  if(STATIC_GITHUB_EDITION){setSourceNote("verified regional collection","live");return}
+  if(location.protocol==="file:"){setSourceNote("start the companion server");return}
+  const requestId=++liveRequestId;
+  if(!quiet)setSourceNote("searching live events…","loading");
+  const params=new URLSearchParams({
+    lat:String(state.home.lat),lng:String(state.home.lng),radius:String(LIVE_RADIUS_MILES[state.drive]||185),
+    start:state.range.s,end:state.range.e,size:"120"
+  });
+  if(state.query)params.set("q",state.query);
+  try{
+    const response=await fetch("/api/events?"+params.toString(),{headers:{Accept:"application/json"}});
+    const payload=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(payload.error||"Live event search failed");
+    if(requestId!==liveRequestId)return;
+    const incoming=Array.isArray(payload.events)?payload.events:[];
+    EVENTS.length=0;
+    incoming.forEach((ev,i)=>EVENTS.push({...ev,_id:ev._id||slug(ev.t),sv:ev.sv??(i*7)%23}));
+    setSourceNote(`${incoming.length} live events`,"live");
+    render();
+  }catch(error){
+    if(requestId!==liveRequestId)return;
+    if(!EVENTS.length)EMBEDDED_EVENTS.forEach(ev=>EVENTS.push({...ev}));
+    setSourceNote("curated preview");
+    if(!quiet)toast(error.message==="Live search is not configured"?"Add your Ticketmaster API key to .env to enable live search.":"Live search is unavailable — showing the curated preview.");
+    render();
+  }
+}
+function scheduleNearbySearch(){
+  clearTimeout(liveSearchTimer);liveSearchTimer=setTimeout(()=>loadNearbyEvents({quiet:true}),450);
+}
 function visible(){
   const s = state.day||state.range.s, e = state.day||state.range.e;
   const pass = ev => overlap(ev,s,e) && state.cats.has(ev.cat)
-    && (!state.freeOnly||ev.free);
+    && (!state.freeOnly||ev.free)
+    && (!state.quickOutdoor||ev.cat==="outdoor"||/outdoor|park|waterfront|beach|garden/i.test((ev.sum||"")+" "+ev.v))
+    && (!state.query||`${ev.t} ${ev.v} ${ev.sum||""} ${CATS[ev.cat].label}`.toLowerCase().includes(state.query));
   const scope = ev => state.bounds ? state.bounds.contains([ev.lat,ev.lng]) : bandOf(ev)<=state.drive;
   return {base:EVENTS.filter(ev=>pass(ev)&&scope(ev)), mine:state.userEvents.filter(pass)};
 }
@@ -798,13 +1110,43 @@ function sortEvents(arr){
 }
 
 /* ============ render ============ */
+function renderSpotlight(all){
+  const spot=$("#spotlight");
+  if(!all.length){spot.style.display="none";return}
+  const ev=[...all].sort((a,b)=>((b.pick?60:0)+(b.sv||0))-((a.pick?60:0)+(a.sv||0)))[0];
+  spot.style.display="block";spot.style.setProperty("--c",CATS[ev.cat].raw);
+  spot.setAttribute("aria-label",`Featured: ${ev.t}`);
+  spot.innerHTML=`<div class="spotlight-art">${catIcon(ev.cat)}</div><div class="spotlight-copy"><span class="spotlight-kicker">Tonight's best bet</span><b>${esc(ev.t)}</b><span>${timeOf(ev)} · ${esc(ev.v)}${ev.free?" · Free":""}</span></div>`;
+  spot.onclick=()=>openDetail(ev);
+  spot.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openDetail(ev)}};
+}
 function render(){
   markers.forEach(m=>map.removeLayer(m)); markers=[];
   const {base,mine} = visible();
   const shown = [...base,...mine.filter(m=>m.status==="private")];
+  const venueGroups=new Map();
   shown.forEach(ev=>{
-    const m = L.marker([ev.lat,ev.lng],{icon:makeIcon(ev)}).addTo(map);
-    m._ev=ev; m.on("click",()=>openDetail(ev));
+    const key=`${ev.lat.toFixed(4)},${ev.lng.toFixed(4)}`;
+    if(!venueGroups.has(key)) venueGroups.set(key,[]);
+    venueGroups.get(key).push(ev);
+  });
+  venueGroups.forEach(group=>{
+    const ev=group[0];
+    const m=L.marker([ev.lat,ev.lng],{icon:group.length>1?makeGroupIcon(group):makeIcon(ev)}).addTo(map);
+    m._ev=ev;m._group=group;
+    if(group.length===1){
+      m.on("click",()=>openDetail(ev));
+    }else{
+      const choices=[...group].sort((a,b)=>a.s.localeCompare(b.s)).map(x=>
+        `<button type="button" data-venue-event="${esc(x._id)}"><span>${fmt(x.s)}</span>${esc(x.t)}</button>`).join("");
+      m.bindPopup(`<div class="venue-popup"><b>${esc(ev.v)}</b>${choices}</div>`,{maxWidth:330,maxHeight:300});
+      m.on("popupopen",e=>{
+        const root=e.popup.getElement();
+        root?.querySelectorAll("[data-venue-event]").forEach(btn=>btn.addEventListener("click",()=>{
+          const chosen=findEv(btn.dataset.venueEvent);map.closePopup();if(chosen)openDetail(chosen);
+        }));
+      });
+    }
     markers.push(m);
   });
   const cards = $("#cards"); cards.innerHTML="";
@@ -816,56 +1158,58 @@ function render(){
   }
   const all=sortEvents([...shown]);
   $("#count").textContent = all.length;
+  renderSpotlight(all);
   if(!all.length){
-    cards.insertAdjacentHTML("beforeend",`<div class="empty"><div class="e-ico">🗺️</div>Nothing matches right now.<div class="e-row"><button class="chip" id="emptyWiden">Show 3 weeks</button><button class="chip" id="emptyReset">Reset filters</button></div></div>`);
+    cards.insertAdjacentHTML("beforeend",`<div class="empty"><div class="e-ico"><span class="material-symbols-rounded" aria-hidden="true">explore_off</span></div>Nothing matches right now.<div class="e-row"><button class="chip" id="emptyWiden">Show next month</button><button class="chip" id="emptyReset">Reset filters</button></div></div>`);
     $("#emptyWiden").onclick=()=>{
       $$("[data-range]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.range==="extended")));
-      state.rangeKey="extended"; state.range=RANGES.extended; state.day=null; render();
+      state.rangeKey="extended"; state.range=RANGES.extended; state.day=null; render();loadNearbyEvents();
     };
     $("#emptyReset").onclick=resetFilters;
   }
   const addCard=(ev,variant)=>{
     const c=CATS[ev.cat];
-    const eff=ev.s>"2026-07-15"?ev.s:"2026-07-15";
+    const eff=ev.s>TODAY?ev.s:TODAY;
     const ed=new Date(eff+"T00:00:00");
     const el=document.createElement("div");
     el.className="card"+(state.activeId===ev._id?" active":"");
-    el.tabIndex=0;
-    const lead = variant==="chip"
-      ? `<div class="dchip"><span>${ed.toLocaleDateString("en-US",{weekday:"short"}).toUpperCase()}</span><b>${ed.getDate()}</b></div>`
-      : `<div class="cicon" style="${grad(ev.cat)}">${c.e}</div>`;
+    el.tabIndex=0; el.setAttribute("role","button"); el.setAttribute("aria-label",`${ev.t}, ${fmt(ev.s)}, ${ev.v}`);
+    const lead=`<div class="cmedia" style="--c:${c.raw}">${catIcon(ev.cat)}<span class="cmedia-tag">${c.label}</span></div>`;
     el.innerHTML=`
       ${lead}
       <div class="cbody">
-        <h3>${variant==="chip"?c.e+" ":""}${esc(ev.t)}${ev.ver?'<span class="vv" title="Verified from official source">✓</span>':""}</h3>
-        <div class="cmeta">${fmt(ev.s)}${ev.e!==ev.s?"–"+fmt(ev.e):""} · ${esc(ev.v)}</div>
+        <h3>${esc(ev.t)}${ev.ver&&/^https?:\/\//.test(ev.url||"")?'<span class="material-symbols-rounded vv" title="Official source linked" aria-label="Official source linked">verified</span>':""}</h3>
+        <div class="cmeta"><span class="ctime">${fmt(ev.s)} · ${timeOf(ev)}</span><br>${esc(ev.v)}</div>
+        <div class="cwhy"><span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span> ${whyOf(ev)}</div>
       </div>
       <div class="cside">
-        ${ev.status==="pending"?'<span class="pill pending">Pending</span>':ev.status==="private"?'<span class="pill private">Private</span>':`<span class="pill ${ev.free?"free":"paid"}">${ev.free?"FREE":"$"}</span>`}
+        ${ev.status==="pending"?'<span class="pill pending">Pending</span>':ev.status==="private"?'<span class="pill private">Private</span>':`<span class="pill ${ev.free?"free":"paid"}">${ev.free?"FREE":esc(ev.priceText||"TICKETS")}</span>`}
         <span class="mini">
-          <button class="${saved.has(ev._id)?"saved":""}" data-save="${ev._id}" title="Save">♥ ${(ev.sv||0)+(saved.has(ev._id)?1:0)}</button>
-          <button data-share="${ev._id}" title="Share">🔗</button>
+          <button class="${saved.has(ev._id)?"saved":""}" data-save="${ev._id}" title="Save" aria-label="Save ${esc(ev.t)}"><span class="material-symbols-rounded" aria-hidden="true">favorite</span></button>
+          <button data-share="${ev._id}" title="Share" aria-label="Share ${esc(ev.t)}"><span class="material-symbols-rounded" aria-hidden="true">ios_share</span></button>
         </span>
       </div>`;
     el.addEventListener("click",e=>{
       const sv=e.target.closest("[data-save]");
-      if(sv){ const id=sv.dataset.save; saved.has(id)?saved.delete(id):saved.add(id); render(); return; }
+      if(sv){ const id=sv.dataset.save; saved.has(id)?saved.delete(id):saved.add(id); persist(); render(); return; }
       const sh=e.target.closest("[data-share]");
       if(sh){ shareEvent(sh.dataset.share); return; }
       if(ev.status!=="pending") openDetail(ev);
     });
-    el.addEventListener("keydown",e=>{if(e.key==="Enter")el.click()});
+    el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();el.click()}});
     cards.appendChild(el);
   };
   const layout = state.sort==="date" ? state.listMode : "flat";
   if(layout==="day"){
-    const LBL=["Today · Wed, Jul 15","Tomorrow · Thu, Jul 16","This weekend · Jul 17–19","Next week","Later this month"];
+    const LBL=[`Today · ${new Date(TODAY+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}`,
+      `Tomorrow · ${new Date(tomorrow+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}`,
+      `This weekend · ${fmt(WEEKEND_START)}–${fmt(WEEKEND_END)}`,"Next 7 days","Later"];
     const bucket=ev=>{
-      const eff=ev.s>"2026-07-15"?ev.s:"2026-07-15";
-      if(eff==="2026-07-15") return 0;
-      if(eff==="2026-07-16") return 1;
-      if(eff>="2026-07-17"&&eff<="2026-07-19") return 2;
-      if(eff<="2026-07-26") return 3;
+      const eff=ev.s>TODAY?ev.s:TODAY;
+      if(eff===TODAY) return 0;
+      if(eff===tomorrow) return 1;
+      if(eff>=WEEKEND_START&&eff<=WEEKEND_END) return 2;
+      if(eff<=addDays(TODAY,7)) return 3;
       return 4;
     };
     let last=-1;
@@ -878,7 +1222,7 @@ function render(){
     const hero=[...all].sort((a,b)=>((b.pick?50:0)+(b.sv||0))-((a.pick?50:0)+(a.sv||0)))[0];
     const hc=CATS[hero.cat];
     cards.insertAdjacentHTML("beforeend",
-      `<div class="hero" style="${grad(hero.cat)}" tabindex="0"><span class="hl">✦ Pick of the day</span><b>${hc.e} ${esc(hero.t)}</b><span class="hm">${fmt(hero.s)}${hero.e!==hero.s?"–"+fmt(hero.e):""} · ${esc(hero.v)}${hero.free?" · Free":""}</span></div>`);
+      `<div class="hero" style="${grad(hero.cat)}" tabindex="0"><span class="hl"><span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span> Pick of the day</span><b>${catIcon(hero.cat)} ${esc(hero.t)}</b><span class="hm">${fmt(hero.s)}${hero.e!==hero.s?"–"+fmt(hero.e):""} · ${esc(hero.v)}${hero.free?" · Free":""}</span></div>`);
     const hEl=cards.lastElementChild;
     hEl.onclick=()=>openDetail(hero);
     hEl.addEventListener("keydown",e=>{if(e.key==="Enter")openDetail(hero)});
@@ -899,18 +1243,30 @@ function renderRail(){
   rail.innerHTML="";
   picks.forEach(ev=>{
     const c=CATS[ev.cat];
-    const d=document.createElement("div");d.className="pick";
-    d.innerHTML=`<div class="thumb" style="${grad(ev.cat)}">${c.e}</div>
-      <div class="pt"><b>${esc(ev.t)}</b><span>${fmt(ev.s)} · ${ev.free?"Free":"Ticketed"}</span></div>`;
+    const d=document.createElement("div");d.className="pick";d.tabIndex=0;d.setAttribute("role","button");
+    d.innerHTML=`<div class="thumb" style="--c:${c.raw}">${catIcon(ev.cat)}</div>
+      <div class="pt"><b>${esc(ev.t)}</b><span>${fmt(ev.s)} · ${timeOf(ev)} · ${ev.free?"Free":"Ticketed"}</span></div>`;
     d.onclick=()=>openDetail(ev);
+    d.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openDetail(ev)}});
     rail.appendChild(d);
   });
 }
 
 /* ============ my stuff: folders & submissions ============ */
-let folders=[{id:"all",name:"All saved"}];
-let folderOf={};
+let folders=Array.isArray(PERSISTED.folders)&&PERSISTED.folders.length?PERSISTED.folders:[{id:"all",name:"All saved"}];
+if(!folders.some(f=>f.id==="all")) folders.unshift({id:"all",name:"All saved"});
+let folderOf=PERSISTED.folderOf&&typeof PERSISTED.folderOf==="object"?PERSISTED.folderOf:{};
 let libTab="saved", activeFolder="all", addingFolder=false;
+function persist(){
+  try{
+    localStorage.setItem("whim-v2",JSON.stringify({
+      saved:[...saved],folders,folderOf,userEvents:state.userEvents,home:state.home,
+      drive:state.drive,cats:[...state.cats],freeOnly:state.freeOnly,sort:state.sort,
+      markerMode:state.markerMode,listMode:state.listMode,light:document.body.classList.contains("light"),
+      bannerDismissed:!document.getElementById("appBanner")
+    }));
+  }catch{}
+}
 const findEv=id=>EVENTS.find(x=>x._id===id)||state.userEvents.find(x=>x._id===id);
 function renderLib(){
   $("#libTabSaved").setAttribute("aria-selected",String(libTab==="saved"));
@@ -920,105 +1276,112 @@ function renderLib(){
     const chips=folders.map(f=>{
       const cnt=f.id==="all"?saved.size:[...saved].filter(id=>(folderOf[id]||"all")===f.id).length;
       return `<button class="lchip${activeFolder===f.id?" on":""}" data-fold="${f.id}">${esc(f.name)} · ${cnt}</button>`;
-    }).join("")+`<button class="lchip new" id="newFold">＋ New folder</button>`;
+    }).join("")+`<button class="lchip new" id="newFold"><span class="material-symbols-rounded" aria-hidden="true">add</span> New folder</button>`;
     const ids=[...saved].filter(id=>activeFolder==="all"||(folderOf[id]||"all")===activeFolder);
     const rows=ids.map(id=>{
       const ev=findEv(id); if(!ev) return "";
       const opts=folders.map(f=>`<option value="${f.id}"${(folderOf[id]||"all")===f.id?" selected":""}>${esc(f.name)}</option>`).join("");
-      return `<div class="lrow"><span class="le">${CATS[ev.cat].e}</span>
+      return `<div class="lrow"><span class="le">${catIcon(ev.cat)}</span>
         <div class="lt" data-open="${id}"><b>${esc(ev.t)}</b><span>${fmt(ev.s)}${ev.e!==ev.s?"–"+fmt(ev.e):""} · ${esc(ev.v)}</span></div>
         <select class="lsel" data-move="${id}" aria-label="Move to folder">${opts}</select>
-        <button class="lx" data-unsave="${id}" title="Remove from saved">✕</button></div>`;
+        <button class="lx" data-unsave="${id}" title="Remove from saved" aria-label="Remove ${esc(ev.t)} from saved"><span class="material-symbols-rounded" aria-hidden="true">close</span></button></div>`;
     }).join("");
     body.innerHTML=`<div class="lchips">${chips}</div>
       ${addingFolder?`<div class="lnew"><input id="foldName" placeholder="Folder name — e.g. Date nights" maxlength="24"><button class="btn-primary" id="foldSave">Add</button></div>`:""}
-      ${rows||`<div class="empty" style="padding:20px">Nothing saved${activeFolder!=="all"?" in this folder":""} yet — tap ♥ on any event.</div>`}`;
+      ${rows||`<div class="empty" style="padding:20px">Nothing saved${activeFolder!=="all"?" in this folder":""} yet — use the Save button on any event.</div>`}`;
     if(addingFolder){
       $("#foldName").focus();
       $("#foldSave").onclick=()=>{
         const n=$("#foldName").value.trim(); if(!n) return;
         const f={id:"f"+Date.now(),name:n};
-        folders.push(f); addingFolder=false; activeFolder=f.id; renderLib();
+        folders.push(f); addingFolder=false; activeFolder=f.id; persist(); renderLib();
       };
       $("#foldName").addEventListener("keydown",e=>{if(e.key==="Enter")$("#foldSave").click()});
     }
     const nf=$("#newFold"); if(nf) nf.onclick=()=>{addingFolder=true;renderLib();};
     body.querySelectorAll("[data-fold]").forEach(b=>b.onclick=()=>{activeFolder=b.dataset.fold;addingFolder=false;renderLib();});
-    body.querySelectorAll("[data-move]").forEach(s=>s.onchange=()=>{folderOf[s.dataset.move]=s.value;renderLib();});
-    body.querySelectorAll("[data-unsave]").forEach(b=>b.onclick=()=>{saved.delete(b.dataset.unsave);delete folderOf[b.dataset.unsave];renderLib();render();});
+    body.querySelectorAll("[data-move]").forEach(s=>s.onchange=()=>{folderOf[s.dataset.move]=s.value;persist();renderLib();});
+    body.querySelectorAll("[data-unsave]").forEach(b=>b.onclick=()=>{saved.delete(b.dataset.unsave);delete folderOf[b.dataset.unsave];persist();renderLib();render();});
     body.querySelectorAll("[data-open]").forEach(d=>d.onclick=()=>{const ev=findEv(d.dataset.open);$("#libOverlay").classList.remove("open");if(ev)openDetail(ev);});
   } else {
-    const rows=state.userEvents.map(ev=>`<div class="lrow"><span class="le">${CATS[ev.cat].e}</span>
+    const rows=state.userEvents.map(ev=>`<div class="lrow"><span class="le">${catIcon(ev.cat)}</span>
       <div class="lt" data-open="${ev._id}"><b>${esc(ev.t)}</b><span>${fmt(ev.s)}${ev.e!==ev.s?"–"+fmt(ev.e):""} · ${esc(ev.v)}</span></div>
       <span class="pill ${ev.status==="pending"?"pending":"private"}">${ev.status==="pending"?"Pending review":"Private"}</span>
-      <button class="lx" data-del="${ev._id}" title="Delete event">🗑</button></div>`).join("");
-    body.innerHTML=rows||`<div class="empty" style="padding:20px">You haven't added any events yet — use ＋ in the toolbar.</div>`;
+      <button class="lx" data-del="${ev._id}" title="Delete event" aria-label="Delete ${esc(ev.t)}"><span class="material-symbols-rounded" aria-hidden="true">delete</span></button></div>`).join("");
+    body.innerHTML=rows||`<div class="empty" style="padding:20px">You haven't added any events yet — use Add in the toolbar.</div>`;
     body.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
       state.userEvents=state.userEvents.filter(x=>x._id!==b.dataset.del);
       saved.delete(b.dataset.del); delete folderOf[b.dataset.del];
-      renderLib(); render(); toast("Event deleted.");
+      persist(); renderLib(); render(); toast("Event deleted.");
     });
     body.querySelectorAll("[data-open]").forEach(d=>d.onclick=()=>{const ev=findEv(d.dataset.open);$("#libOverlay").classList.remove("open");if(ev)openDetail(ev);});
   }
 }
-$("#openLib").addEventListener("click",()=>{libTab="saved";addingFolder=false;renderLib();$("#libOverlay").classList.add("open");});
-$("#closeLib").addEventListener("click",()=>$("#libOverlay").classList.remove("open"));
-$("#libOverlay").addEventListener("click",e=>{if(e.target.id==="libOverlay")$("#libOverlay").classList.remove("open")});
+$("#openLib").addEventListener("click",()=>{libTab="saved";addingFolder=false;renderLib();showOverlay("#libOverlay","#closeLib");});
+$("#closeLib").addEventListener("click",()=>hideOverlay("#libOverlay"));
+$("#libOverlay").addEventListener("click",e=>{if(e.target.id==="libOverlay")hideOverlay("#libOverlay")});
 $("#libTabSaved").addEventListener("click",()=>{libTab="saved";renderLib();});
 $("#libTabSubs").addEventListener("click",()=>{libTab="subs";renderLib();});
 
 /* ============ detail sheet ============ */
+let lastFocus=null;
 function openDetail(ev){
+  if(!$("#detailOv").classList.contains("open")) lastFocus=document.activeElement;
   state.activeId=ev._id;
   const c=CATS[ev.cat];
   const gmaps=`https://www.google.com/maps/dir/?api=1&destination=${ev.lat},${ev.lng}`;
   const safeUrl = ev.url && /^https?:\/\//.test(ev.url) ? ev.url : null;
   $("#detailPane").innerHTML=`
-    <div class="d-hero" style="${grad(ev.cat)}">${c.e}
-      <button class="d-close" id="dClose" aria-label="Close">✕</button></div>
+    <div class="d-hero" style="--c1:${c.raw};--c2:#101827">${catIcon(ev.cat)}
+      <button class="d-close" id="dClose" aria-label="Close"><span class="material-symbols-rounded" aria-hidden="true">close</span></button></div>
     <div class="d-body">
-      <h2>${esc(ev.t)}</h2>
-      <div class="d-sub">${c.label} · ${DRIVE_LABEL[Math.min(bandOf(ev),3)]} drive from ${esc(state.home.name)}</div>
+      <h2 id="detailTitle">${esc(ev.t)}</h2>
+      <div class="d-sub">${c.label} · ${DRIVE_LABEL[Math.min(bandOf(ev),3)]} of ${esc(state.home.name)}</div>
       <div class="d-badges">
-        ${ev.free?'<span class="pill free">FREE</span>':'<span class="pill paid">Ticketed · price on official site</span>'}
-        ${ev.ver?'<span class="pill ver">✓ Verified from official source</span>':'<span class="pill pending">Unverified — check official site</span>'}
+        ${ev.free?'<span class="pill free">FREE</span>':`<span class="pill paid">${esc(ev.priceText||"Ticketed · price on official site")}</span>`}
+        ${ev.ver&&safeUrl?'<span class="pill ver"><span class="material-symbols-rounded" aria-hidden="true">verified</span> Official source linked</span>':'<span class="pill pending">Needs confirmation</span>'}
       </div>
       <p class="d-summary">${esc(ev.sum||"")}</p>
       <div class="d-facts">
-        <div class="d-fact"><span class="fl">When</span><span>${fmt(ev.s)}${ev.e!==ev.s?" – "+fmt(ev.e):""}, 2026</span></div>
+        <div class="d-fact"><span class="fl">When</span><span>${new Date(ev.s+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}${ev.e!==ev.s?" – "+new Date(ev.e+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):""} · ${timeOf(ev)}</span></div>
         <div class="d-fact"><span class="fl">Where</span><span>${esc(ev.v)}</span></div>
-        <div class="d-fact"><span class="fl">Saved by</span><span>♥ ${(ev.sv||0)+(saved.has(ev._id)?1:0)} people</span></div>
+        <div class="d-fact"><span class="fl">Good to know</span><span>${/18\+|21\+/i.test(ev.v+" "+ev.sum)?"Age restriction — verify before going":/outdoor|park|beach|waterfront|garden/i.test(ev.v+" "+ev.sum)?"Outdoor event — check the weather":"Check the official source for entry details"}</span></div>
+        <div class="d-fact"><span class="fl">Source</span><span>${safeUrl?`${esc(ev.provider||"Official source")} · checked ${fmt(ev.checked||TODAY)}`:"Community listing · confirmation recommended"}</span></div>
+        <div class="d-fact"><span class="fl">Saved by</span><span><span class="material-symbols-rounded" aria-hidden="true">favorite</span> ${(ev.sv||0)+(saved.has(ev._id)?1:0)} people</span></div>
       </div>
       <div class="d-actions">
         ${safeUrl?`<a class="d-btn primary" href="${safeUrl}" target="_blank" rel="noopener">Official site — details & tickets ↗</a>`:""}
-        ${ev.tix&&/^https?:\/\//.test(ev.tix)&&ev.tix!==ev.url?`<a class="d-btn" href="${ev.tix}" target="_blank" rel="noopener" style="grid-column:1/-1">🎟 Tickets</a>`:""}
-        <button class="d-btn plan" id="dPlan">🗳 Plan it with the group chat</button>
-        <a class="d-btn" href="${gmaps}" target="_blank" rel="noopener">🧭 Directions</a>
-        <button class="d-btn" id="dCal">📅 Calendar</button>
-        <button class="d-btn ${saved.has(ev._id)?"saved":""}" id="dSave">♥ ${saved.has(ev._id)?"Saved":"Save"}</button>
-        <button class="d-btn" id="dShare">🔗 Copy link</button>
+        ${ev.tix&&/^https?:\/\//.test(ev.tix)&&ev.tix!==ev.url?`<a class="d-btn" href="${ev.tix}" target="_blank" rel="noopener" style="grid-column:1/-1"><span class="material-symbols-rounded" aria-hidden="true">confirmation_number</span> Tickets</a>`:""}
+        <button class="d-btn plan" id="dPlan"><span class="material-symbols-rounded" aria-hidden="true">group</span> Start a plan with friends</button>
+        <a class="d-btn" href="${gmaps}" target="_blank" rel="noopener">Directions</a>
+        <button class="d-btn" id="dCal">Add to calendar</button>
+        <button class="d-btn ${saved.has(ev._id)?"saved":""}" id="dSave">${saved.has(ev._id)?"Saved":"Save"}</button>
+        <button class="d-btn" id="dShare">Share</button>
       </div>
     </div>`;
   $("#detailOv").classList.add("open");
+  $("#detailPane").focus();
   $("#dClose").onclick=closeDetail;
   $("#detailOv").onclick=e=>{if(e.target.id==="detailOv")closeDetail()};
   $("#dShare").onclick=()=>shareEvent(ev._id);
-  $("#dSave").onclick=()=>{saved.has(ev._id)?saved.delete(ev._id):saved.add(ev._id);openDetail(ev);render();};
+  $("#dSave").onclick=()=>{saved.has(ev._id)?saved.delete(ev._id):saved.add(ev._id);persist();openDetail(ev);render();};
   $("#dCal").onclick=()=>downloadIcs(ev);
   $("#dPlan").onclick=()=>{
-    const link=location.href.split("#")[0]+"#e="+ev._id;
-    const msg=`${ev.t} — ${fmt(ev.s)}${ev.e!==ev.s?"–"+fmt(ev.e):""} at ${ev.v}. Who's in? ${link}`;
-    (navigator.clipboard?.writeText(msg)||Promise.reject()).then(()=>toast("Group-chat message copied — paste and see who's in."))
-      .catch(()=>toast(msg));
+    selectedPlan.clear();selectedPlan.add(ev._id);closeDetail();renderPlanList();showOverlay("#plansOverlay","#planName");
   };
   map.flyTo([ev.lat,ev.lng],Math.max(map.getZoom(),11),{duration:.5});
 }
-function closeDetail(){$("#detailOv").classList.remove("open")}
+function closeDetail(){
+  const wasOpen=$("#detailOv").classList.contains("open");
+  $("#detailOv").classList.remove("open");
+  state.activeId=null;
+  if(wasOpen&&lastFocus&&document.contains(lastFocus)) lastFocus.focus();
+}
 function downloadIcs(ev){
   const d1=ev.s.replace(/-/g,""), end=new Date(ev.e+"T00:00:00");end.setDate(end.getDate()+1);
   const d2=end.toISOString().slice(0,10).replace(/-/g,"");
   const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Whim//EN","BEGIN:VEVENT",
-    "UID:"+ev._id+"@whim.app","DTSTAMP:20260715T000000Z",
+    "UID:"+ev._id+"@whim.app","DTSTAMP:"+TODAY.replace(/-/g,"")+"T000000Z",
     "DTSTART;VALUE=DATE:"+d1,"DTEND;VALUE=DATE:"+d2,
     "SUMMARY:"+ev.t.replace(/,/g,"\\,"),"LOCATION:"+ev.v.replace(/,/g,"\\,"),
     "DESCRIPTION:"+(ev.sum||"").replace(/,/g,"\\,")+(ev.url&&ev.url!=="#"?" — "+ev.url:""),
@@ -1026,19 +1389,19 @@ function downloadIcs(ev){
   const a=document.createElement("a");
   a.href="data:text/calendar;charset=utf-8,"+encodeURIComponent(ics);
   a.download=ev._id+".ics";document.body.appendChild(a);a.click();a.remove();
-  toast("Calendar file downloaded 📅");
+  toast("Calendar file downloaded");
 }
 
 /* ============ day strip ============ */
 function buildDaystrip(){
   const strip=$("#daystrip"); strip.innerHTML="";
-  const {s,e}= state.rangeKey==="extended"?{s:"2026-07-15",e:"2026-08-05"}:state.range;
+  const {s,e}=state.range;
   const start=new Date(s+"T00:00:00"), end=new Date(e+"T00:00:00");
   for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
     const iso=d.toISOString().slice(0,10);
     const evs=EVENTS.filter(ev=>overlap(ev,iso,iso)&&bandOf(ev)<=state.drive&&state.cats.has(ev.cat)&&(!state.freeOnly||ev.free));
     const btn=document.createElement("button");
-    btn.className="day"+(state.day===iso?" sel":"")+(iso==="2026-07-15"?" today":"")+(evs.length===0?" dim":"");
+    btn.className="day"+(state.day===iso?" sel":"")+(iso===TODAY?" today":"")+(evs.length===0?" dim":"");
     btn.innerHTML=`<small>${d.toLocaleDateString("en-US",{weekday:"short"})}</small><b>${d.getDate()}</b>
       <span class="dots">${evs.slice(0,5).map(ev=>`<i style="background:${CATS[ev.cat].raw}"></i>`).join("")}</span>`;
     btn.title=`${evs.length} event${evs.length!==1?"s":""}`;
@@ -1049,20 +1412,20 @@ function buildDaystrip(){
 
 /* ============ controls ============ */
 const RANGES={
-  today:{s:"2026-07-15",e:"2026-07-15"},
-  weekend:{s:"2026-07-17",e:"2026-07-19"},
-  week:{s:"2026-07-15",e:"2026-07-22"},
-  extended:{s:"2026-07-15",e:"2026-08-05"},
+  today:{s:TODAY,e:TODAY},
+  weekend:{s:WEEKEND_START,e:WEEKEND_END},
+  week:{s:TODAY,e:addDays(TODAY,7)},
+  extended:{s:TODAY,e:addDays(TODAY,31)},
 };
 $$("[data-range]").forEach(b=>b.addEventListener("click",()=>{
   $$("[data-range]").forEach(x=>x.setAttribute("aria-pressed","false"));
   b.setAttribute("aria-pressed","true");
-  state.rangeKey=b.dataset.range; state.range=RANGES[b.dataset.range]; state.day=null; render();
+  state.rangeKey=b.dataset.range; state.range=RANGES[b.dataset.range]; state.day=null; syncQuickUI(); render();loadNearbyEvents();
 }));
 $$("[data-drive]").forEach(b=>b.addEventListener("click",()=>{
   $$("[data-drive]").forEach(x=>x.setAttribute("aria-pressed","false"));
   b.setAttribute("aria-pressed","true");
-  state.drive=+b.dataset.drive; render();
+  state.drive=+b.dataset.drive; persist(); render();loadNearbyEvents();
   userMoved=false;
   const z=[11,10,9,8][state.drive]; map.flyTo([state.home.lat,state.home.lng],z,{duration:.6});
   setTimeout(()=>{userMoved=false;$("#searchArea").classList.remove("show")},700);
@@ -1070,64 +1433,72 @@ $$("[data-drive]").forEach(b=>b.addEventListener("click",()=>{
 $("#freeChip").addEventListener("click",()=>{
   state.freeOnly=!state.freeOnly;
   $("#freeChip").setAttribute("aria-pressed",String(state.freeOnly));
-  render();
+  syncQuickUI();persist(); render();
 });
-$("#sortSel").addEventListener("change",e=>{state.sort=e.target.value;render()});
+$("#sortSel").addEventListener("change",e=>{state.sort=e.target.value;persist();render()});
 const catGrid=$("#catGrid");
 Object.entries(CATS).forEach(([k,c])=>{
   const b=document.createElement("button");
   b.className="cat-tile"; b.setAttribute("aria-pressed","true"); b.dataset.cat=k;
-  b.innerHTML=`<span class="ce">${c.e}</span>${c.label}`;
+  b.innerHTML=`<span class="ce">${catIcon(k)}</span>${c.label}`;
   b.addEventListener("click",()=>{
     const on=b.getAttribute("aria-pressed")==="true";
     b.setAttribute("aria-pressed",String(!on));
-    on?state.cats.delete(k):state.cats.add(k); render();
+    on?state.cats.delete(k):state.cats.add(k); persist(); render();
   });
   catGrid.appendChild(b);
 });
-$("#openFilters").addEventListener("click",()=>$("#filterOverlay").classList.add("open"));
-$("#closeFilters").addEventListener("click",()=>$("#filterOverlay").classList.remove("open"));
-$("#filterOverlay").addEventListener("click",e=>{if(e.target.id==="filterOverlay")$("#filterOverlay").classList.remove("open")});
+$("#openFilters").addEventListener("click",()=>showOverlay("#filterOverlay","#closeFilters"));
+$("#closeFilters").addEventListener("click",()=>hideOverlay("#filterOverlay"));
+$("#filterOverlay").addEventListener("click",e=>{if(e.target.id==="filterOverlay")hideOverlay("#filterOverlay")});
 $("#catAll").addEventListener("click",()=>{
   state.cats=new Set(Object.keys(CATS));
-  $$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed","true")); render();
+  $$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed","true")); persist(); render();
 });
 $("#catNone").addEventListener("click",()=>{
   state.cats=new Set();
-  $$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed","false")); render();
+  $$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed","false")); persist(); render();
 });
 function updateBadge(){
-  const n=(state.day?1:0)+(state.freeOnly?1:0)+(state.drive<3?1:0)+(Object.keys(CATS).length-state.cats.size>0?1:0);
+  const n=(state.rangeKey!=="week"?1:0)+(state.day?1:0)+(state.freeOnly?1:0)+(state.quickOutdoor?1:0)+(state.drive<3?1:0)+(Object.keys(CATS).length-state.cats.size>0?1:0);
   const b=$("#fBadge"); b.hidden=!n; b.textContent=n;
 }
 function resetFilters(){
+  state.rangeKey="week"; state.range=RANGES.week;
+  $$("[data-range]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.range==="week")));
   state.freeOnly=false; $("#freeChip").setAttribute("aria-pressed","false");
   state.cats=new Set(Object.keys(CATS));
   $$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed","true"));
   state.drive=3;
   $$("[data-drive]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.drive==="3")));
   state.bounds=null; $("#areaChip").style.display="none"; state.day=null;
-  render();
+  state.query="";state.quickOutdoor=false;$("#discoverSearch").value="";
+  syncQuickUI();persist(); render();loadNearbyEvents({quiet:true});
 }
 
 /* ============ submit flow ============ */
 const catSel=$("#fCat");
-Object.entries(CATS).forEach(([k,c])=>catSel.insertAdjacentHTML("beforeend",`<option value="${k}">${c.e} ${c.label}</option>`));
+Object.entries(CATS).forEach(([k,c])=>catSel.insertAdjacentHTML("beforeend",`<option value="${k}">${c.label}</option>`));
+$("#fStart").addEventListener("change",()=>{
+  $("#fEnd").min=$("#fStart").value||TODAY;
+  if($("#fEnd").value<$("#fEnd").min) $("#fEnd").value=$("#fEnd").min;
+});
 let vis="public";
 $("#visRow").addEventListener("click",e=>{
   const o=e.target.closest(".vis-opt"); if(!o)return;
-  $$(".vis-opt").forEach(x=>x.classList.remove("sel")); o.classList.add("sel"); vis=o.dataset.vis;
+  $$(".vis-opt").forEach(x=>{x.classList.remove("sel");x.setAttribute("aria-pressed","false")});
+  o.classList.add("sel"); o.setAttribute("aria-pressed","true"); vis=o.dataset.vis;
 });
-$("#openSubmit").addEventListener("click",()=>$("#overlay").classList.add("open"));
-$("#cancelSubmit").addEventListener("click",()=>$("#overlay").classList.remove("open"));
-$("#overlay").addEventListener("click",e=>{if(e.target.id==="overlay")$("#overlay").classList.remove("open")});
+$("#openSubmit").addEventListener("click",()=>showOverlay("#overlay","#fName"));
+$("#cancelSubmit").addEventListener("click",()=>hideOverlay("#overlay"));
+$("#overlay").addEventListener("click",e=>{if(e.target.id==="overlay")hideOverlay("#overlay")});
 let placing=null;
 $("#saveSubmit").addEventListener("click",()=>{
   const name=$("#fName").value.trim(); if(!name){$("#fName").focus();return;}
   let url=$("#fUrl").value.trim();
   if(url && !/^https?:\/\//i.test(url)) url="https://"+url;
   if(url && !/^https?:\/\/[\w.-]+/i.test(url)) url="";
-  const ev={t:name,s:$("#fStart").value||"2026-07-16",e:$("#fEnd").value||$("#fStart").value||"2026-07-16",
+  const ev={t:name,s:$("#fStart").value||TODAY,e:$("#fEnd").value||$("#fStart").value||TODAY,
     v:$("#fPlace").value.trim()||"To be placed on map",cat:catSel.value,d:0,
     url:url||"#",free:false,ver:false,sv:0,
     sum: vis==="private"?"Your private event.":"Community submission — awaiting moderator approval.",
@@ -1135,7 +1506,8 @@ $("#saveSubmit").addEventListener("click",()=>{
     lat:47.6062,lng:-122.3321,_id:"u"+Date.now()};
   if(ev.e<ev.s) ev.e=ev.s;
   state.userEvents.push(ev);
-  $("#overlay").classList.remove("open");
+  persist();
+  hideOverlay("#overlay");
   ["fName","fPlace","fUrl"].forEach(id=>$("#"+id).value="");
   if(vis==="private"){ placing=ev; toast("Private pin added — click the map to place it exactly."); }
   else toast("Submitted! A moderator will review it before it goes public.");
@@ -1150,7 +1522,7 @@ map.on("click",e=>{
 document.addEventListener("keydown",e=>{
   if(e.key!=="Escape")return;
   closeDetail();
-  $$(".overlay").forEach(o=>o.classList.remove("open"));
+  $$(".overlay.open").forEach(o=>hideOverlay("#"+o.id));
 });
 
 /* ============ shareable links ============ */
@@ -1162,6 +1534,11 @@ window.shareEvent = id=>{
   } else toast(url);
 };
 function openFromHash(){
+  const planMatch=location.hash.match(/plan=([\w,-]+)/);
+  if(planMatch){
+    selectedPlan.clear();planMatch[1].split(",").map(findEv).filter(Boolean).slice(0,3).forEach(ev=>selectedPlan.add(ev._id));
+    renderPlanList();showOverlay("#plansOverlay","#planName");return;
+  }
   const m = location.hash.match(/e=([\w-]+)/); if(!m) return;
   const ev = [...EVENTS,...state.userEvents].find(x=>x._id===m[1]); if(!ev) return;
   state.rangeKey="extended"; state.range=RANGES.extended; state.day=null; state.drive=3;
@@ -1174,29 +1551,32 @@ function openFromHash(){
 window.addEventListener("hashchange",openFromHash);
 
 /* ============ weekly digest ============ */
-const DIGEST_LABEL = ["in Seattle","within a 1-hour drive","within a 2-hour drive","within a 3-hour drive"];
+const DIGEST_LABEL = ["in your city","within about one hour","within about two hours","within about three hours"];
 $("#openDigest").addEventListener("click",()=>{
-  const wknd = {s:"2026-07-17",e:"2026-07-19"};
+  const wknd = {s:WEEKEND_START,e:WEEKEND_END};
   const pool = EVENTS.filter(ev=>overlap(ev,wknd.s,wknd.e)&&bandOf(ev)<=state.drive&&state.cats.has(ev.cat)&&(!state.freeOnly||ev.free));
   const free = pool.filter(ev=>ev.free).length;
   const dl = state.drive===0 ? `in ${state.home.name}` : DIGEST_LABEL[state.drive]+` of ${state.home.name}`;
   $("#dSubj").textContent = `Your weekend, on a whim: ${pool.length} picks ${dl} — ${free} free`;
-  const days = [["Friday, Jul 17","2026-07-17"],["Saturday, Jul 18","2026-07-18"],["Sunday, Jul 19","2026-07-19"]];
+  const days = [0,1,2].map(n=>{
+    const iso=addDays(WEEKEND_START,n);
+    return [new Date(iso+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"}),iso];
+  });
   $("#dBody").innerHTML = days.map(([label,iso])=>{
     const evs = pool.filter(ev=>overlap(ev,iso,iso)).sort((a,b)=>(b.sv||0)-(a.sv||0)).slice(0,4);
     if(!evs.length) return "";
     return `<h4>${label}</h4>` + evs.map(ev=>`
-      <div class="d-item"><span class="de">${CATS[ev.cat].e}</span>
-        <div><b>${esc(ev.t)}</b><span class="dm">${esc(ev.v)} · ♥ ${ev.sv} saved${ev.free?" · Free":""}</span>
+      <div class="d-item"><span class="de">${catIcon(ev.cat)}</span>
+        <div><b>${esc(ev.t)}</b><span class="dm">${esc(ev.v)} · <span class="material-symbols-rounded" aria-hidden="true">favorite</span> ${ev.sv} saved${ev.free?" · Free":""}</span>
         <a href="#" onclick="shareEvent('${ev._id}');return false">Copy link</a></div></div>`).join("");
   }).join("");
-  $("#digestOverlay").classList.add("open");
+  showOverlay("#digestOverlay","#closeDigest");
 });
-$("#closeDigest").addEventListener("click",()=>$("#digestOverlay").classList.remove("open"));
-$("#digestOverlay").addEventListener("click",e=>{if(e.target.id==="digestOverlay")$("#digestOverlay").classList.remove("open")});
+$("#closeDigest").addEventListener("click",()=>hideOverlay("#digestOverlay"));
+$("#digestOverlay").addEventListener("click",e=>{if(e.target.id==="digestOverlay")hideOverlay("#digestOverlay")});
 
 /* ============ smart app banner ============ */
-$("#abX").addEventListener("click",()=>{ $("#appBanner").remove(); document.body.classList.remove("hasbanner"); });
+$("#abX").addEventListener("click",()=>{ $("#appBanner").remove(); document.body.classList.remove("hasbanner"); persist(); });
 $("#abOpen").addEventListener("click",()=>{
   const t=Date.now();
   location.href="whim://open"+location.hash;   /* custom URL scheme the native app registers */
@@ -1204,6 +1584,70 @@ $("#abOpen").addEventListener("click",()=>{
     if(Date.now()-t<1600) toast("App not installed yet — in production this falls back to the App Store / Play Store listing.");
   },1200);
 });
+
+/* ============ discover experience ============ */
+function syncQuickUI(){
+  const active={tonight:state.rangeKey==="today",weekend:state.rangeKey==="weekend",free:state.freeOnly,outdoor:state.quickOutdoor};
+  $$("[data-quick]").forEach(b=>b.setAttribute("aria-pressed",String(!!active[b.dataset.quick])));
+}
+$("#discoverSearch").addEventListener("input",e=>{state.query=e.target.value.trim().toLowerCase();render();scheduleNearbySearch()});
+$("#quickFilters").addEventListener("click",()=>showOverlay("#filterOverlay","#closeFilters"));
+$$("[data-quick]").forEach(b=>b.addEventListener("click",()=>{
+  const q=b.dataset.quick;
+  if(q==="tonight"||q==="weekend"){
+    const next=state.rangeKey===q?"week":q;
+    state.rangeKey=next;state.range=RANGES[next];state.day=null;
+    $$("[data-range]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.range===next)));
+  }else if(q==="free"){
+    state.freeOnly=!state.freeOnly;$("#freeChip").setAttribute("aria-pressed",String(state.freeOnly));
+  }else if(q==="outdoor") state.quickOutdoor=!state.quickOutdoor;
+  syncQuickUI();persist();render();loadNearbyEvents({quiet:true});
+}));
+$("#surpriseBtn").addEventListener("click",()=>{
+  const pool=sortEvents([...visible().base]);
+  if(!pool.length){toast("No matching surprises yet — try widening your filters.");return}
+  const weighted=pool.filter(e=>e.pick);const choices=weighted.length?weighted:pool.slice(0,12);
+  openDetail(choices[Math.floor(Math.random()*choices.length)]);
+});
+function setPrimaryView(view){
+  document.body.classList.toggle("map-view",view==="map");
+  view==="discover"?$("#discoverBtn").setAttribute("aria-current","page"):$("#discoverBtn").removeAttribute("aria-current");
+  view==="map"?$("#mapBtn").setAttribute("aria-current","page"):$("#mapBtn").removeAttribute("aria-current");
+  if(view==="map")setTimeout(()=>map.invalidateSize(),50);
+}
+$("#discoverBtn").addEventListener("click",()=>setPrimaryView("discover"));
+$("#mapBtn").addEventListener("click",()=>setPrimaryView("map"));
+
+/* ============ collaborative plans ============ */
+const selectedPlan=new Set();
+function renderPlanList(){
+  const selected=[...selectedPlan].map(findEv).filter(Boolean);
+  const candidates=[...saved].map(findEv).filter(Boolean);
+  const fallback=sortEvents([...visible().base]).slice(0,6);
+  const pool=[...new Map([...selected,...(candidates.length?candidates:fallback)].map(ev=>[ev._id,ev])).values()].slice(0,8);
+  const list=$("#planList");
+  list.innerHTML=pool.map(ev=>`<label class="plan-option"><input type="checkbox" value="${ev._id}" ${selectedPlan.has(ev._id)?"checked":""}><span class="po-copy"><b>${esc(ev.t)}</b><span>${fmt(ev.s)} · ${timeOf(ev)} · ${esc(ev.v)}</span></span><span class="pill ${ev.free?"free":"paid"}">${ev.free?"Free":"Tickets"}</span></label>`).join("");
+  list.querySelectorAll("input").forEach(input=>input.addEventListener("change",()=>{
+    if(input.checked&&selectedPlan.size>=3){input.checked=false;toast("Keep the ballot focused — choose up to three.");return}
+    input.checked?selectedPlan.add(input.value):selectedPlan.delete(input.value);renderPlanPreview();
+  }));
+  renderPlanPreview();
+}
+function renderPlanPreview(){
+  const choices=[...selectedPlan].map(findEv).filter(Boolean);
+  $("#planPreview").innerHTML=choices.length?`<b>${esc($("#planName").value||"Your plan")}</b>${choices.map((ev,i)=>`${i+1}. ${esc(ev.t)} · ${fmt(ev.s)}`).join("<br>")}<br><span style="color:var(--muted)">Friends vote with one tap. No account required.</span>`:`<b>Your mini ballot</b>Select up to three events to create a shareable vote.`;
+}
+$("#planName").addEventListener("input",renderPlanPreview);
+$("#openPlans").addEventListener("click",()=>{renderPlanList();showOverlay("#plansOverlay","#planName")});
+$("#closePlans").addEventListener("click",()=>hideOverlay("#plansOverlay"));
+$("#plansOverlay").addEventListener("click",e=>{if(e.target.id==="plansOverlay")hideOverlay("#plansOverlay")});
+$("#sharePlan").addEventListener("click",()=>{
+  const choices=[...selectedPlan].map(findEv).filter(Boolean);if(!choices.length){toast("Choose at least one event first.");return}
+  const link=location.href.split("#")[0]+"#plan="+choices.map(e=>e._id).join(",");
+  const message=`${$("#planName").value||"Which one should we do?"}\n${choices.map((e,i)=>`${i+1}. ${e.t} — ${fmt(e.s)} at ${e.v}`).join("\n")}\nVote here: ${link}`;
+  (navigator.clipboard?.writeText(message)||Promise.reject()).then(()=>toast("Invite copied — send it to the group chat.")).catch(()=>toast("Your plan is ready to share."));
+});
+$("#planCalendar").addEventListener("click",()=>{const winner=findEv([...selectedPlan][0]);winner?downloadIcs(winner):toast("Choose an event first.")});
 
 /* ============ mobile sheet: collapsed peek → tap to expand ============ */
 const panelEl=$("#panel");
@@ -1215,21 +1659,31 @@ panelEl.addEventListener("click",()=>{
   if(window.innerWidth<=760 && !panelEl.classList.contains("open")) panelEl.classList.add("open");
 });
 
+/* ============ restore preferences ============ */
+$("#homeName").textContent=state.home.name;
+$("#sortSel").value=state.sort;
+$("#fStart").min=TODAY; $("#fStart").value=TODAY;
+$("#fEnd").min=TODAY; $("#fEnd").value=TODAY;
+$("#freeChip").setAttribute("aria-pressed",String(state.freeOnly));
+$$("[data-drive]").forEach(x=>x.setAttribute("aria-pressed",String(+x.dataset.drive===state.drive)));
+$$("[data-cat]").forEach(x=>x.setAttribute("aria-pressed",String(state.cats.has(x.dataset.cat))));
+$("#segLabels").setAttribute("aria-pressed",String(state.markerMode==="labels"));
+$("#segIcons").setAttribute("aria-pressed",String(state.markerMode==="icons"));
+$$("[data-lmode]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.lmode===state.listMode)));
+if(PERSISTED.light){
+  document.body.classList.add("light");
+  $("#iconSun").style.display="none"; $("#iconMoon").style.display="block";
+  $("#themeGlyph").textContent="dark_mode";
+  document.querySelector('meta[name="theme-color"]').setAttribute("content","#f4f5f8");
+  map.removeLayer(darkTiles); lightTiles.addTo(map);
+}
+if(PERSISTED.bannerDismissed){
+  $("#appBanner").remove(); document.body.classList.remove("hasbanner");
+}
+syncQuickUI();setPrimaryView("discover");
 render();
 openFromHash();
-if(!location.hash.includes("e=")) locateOnce();
-
-/* ============ live dataset ============
-   When hosted, the app prefers events.json in the same folder —
-   refreshed daily by the GitHub Action (see update-events.mjs).
-   Falls back silently to the embedded dataset (e.g. opened as a local file). */
-fetch("events.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{
-  if(!d||!Array.isArray(d)||!d.length) return;
-  EVENTS.length=0;
-  d.forEach(e=>EVENTS.push(e));
-  EVENTS.forEach((ev,i)=>{ ev._id=ev._id||slug(ev.t); ev.sv=ev.sv??5+(i*7)%38+(ev.free?6:0); });
-  render();
-}).catch(()=>{});
+loadNearbyEvents({quiet:true});
 </script>
 </body>
 </html>
