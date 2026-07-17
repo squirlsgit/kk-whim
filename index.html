@@ -381,7 +381,7 @@
     <button class="sheet-toggle" id="sheetToggle" aria-label="Expand or collapse list"><i></i></button>
     <section class="discover-top" aria-labelledby="discoverTitle">
       <div class="discover-brand">
-        <div class="brand-mark" aria-hidden="true">W</div>
+        <svg width="38" height="38" viewBox="0 0 100 100" aria-hidden="true" style="border-radius:13px;box-shadow:0 8px 24px rgba(139,92,246,.28)"><defs><linearGradient id="wm" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="55%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs><rect width="100" height="100" rx="23" fill="url(#wm)"/><g transform="translate(50,50) rotate(28)"><path d="M-4,52 A38 38 0 0 1 -36,14" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.55" transform="scale(0.72)"/><path d="M0,-27 L9,2 L-9,2 Z" fill="#fff"/><path d="M0,27 L9,-2 L-9,-2 Z" fill="#fff" opacity=".45"/><circle r="5" fill="#fff"/><circle r="2.2" fill="#38bdf8"/></g></svg>
         <div class="wordmark"><b>Whim</b><span>Your city, less predictable.</span></div>
         <button class="top-icon" id="openDigest" aria-label="Open weekend digest" title="Weekend digest"><span class="material-symbols-rounded" aria-hidden="true">mail</span></button>
         <button class="top-icon" id="themeToggle" aria-label="Toggle light or dark mode" title="Change theme"><span class="material-symbols-rounded" id="themeGlyph" aria-hidden="true">light_mode</span><span id="iconSun" hidden></span><span id="iconMoon" hidden></span></button>
@@ -433,8 +433,8 @@
     </div>
     <button class="filter-fab" id="openFilters" aria-label="Filters"><span class="material-symbols-rounded" aria-hidden="true">tune</span><span class="fbadge" id="fBadge" hidden>0</span></button>
     <nav class="bottomnav" aria-label="Primary navigation">
-      <button class="bn-btn" id="mapBtn"><span class="material-symbols-rounded" aria-hidden="true">map</span>Map</button>
-      <button class="bn-btn" id="discoverBtn" aria-current="page"><span class="material-symbols-rounded" aria-hidden="true">explore</span>Discover</button>
+      <button class="bn-btn" id="mapBtn" aria-current="page"><span class="material-symbols-rounded" aria-hidden="true">map</span>Map</button>
+      <button class="bn-btn" id="discoverBtn"><span class="material-symbols-rounded" aria-hidden="true">explore</span>Discover</button>
       <button class="bn-btn" id="openLib" aria-label="Saved events"><span class="material-symbols-rounded" aria-hidden="true">favorite</span>Saved</button>
       <button class="bn-btn" id="openPlans" aria-label="Plans with friends"><span class="material-symbols-rounded" aria-hidden="true">group</span>Plans</button>
       <button class="bn-btn" id="openSubmit" aria-label="Add an event"><span class="material-symbols-rounded" aria-hidden="true">add_circle</span>Add</button>
@@ -1636,8 +1636,7 @@ function setPrimaryView(view){
   if(view==="map")setTimeout(()=>map.invalidateSize(),50);
 }
 $("#discoverBtn").addEventListener("click",()=>setPrimaryView("discover"));
-$("#mapBtn").addEventListener("click",()=>
-);
+$("#mapBtn").addEventListener("click",()=>setPrimaryView("map"));
 
 /* ============ collaborative plans ============ */
 const selectedPlan=new Set();
