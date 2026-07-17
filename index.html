@@ -433,8 +433,8 @@
     </div>
     <button class="filter-fab" id="openFilters" aria-label="Filters"><span class="material-symbols-rounded" aria-hidden="true">tune</span><span class="fbadge" id="fBadge" hidden>0</span></button>
     <nav class="bottomnav" aria-label="Primary navigation">
-      <button class="bn-btn" id="discoverBtn" aria-current="page"><span class="material-symbols-rounded" aria-hidden="true">explore</span>Discover</button>
       <button class="bn-btn" id="mapBtn"><span class="material-symbols-rounded" aria-hidden="true">map</span>Map</button>
+      <button class="bn-btn" id="discoverBtn" aria-current="page"><span class="material-symbols-rounded" aria-hidden="true">explore</span>Discover</button>
       <button class="bn-btn" id="openLib" aria-label="Saved events"><span class="material-symbols-rounded" aria-hidden="true">favorite</span>Saved</button>
       <button class="bn-btn" id="openPlans" aria-label="Plans with friends"><span class="material-symbols-rounded" aria-hidden="true">group</span>Plans</button>
       <button class="bn-btn" id="openSubmit" aria-label="Add an event"><span class="material-symbols-rounded" aria-hidden="true">add_circle</span>Add</button>
@@ -1060,9 +1060,29 @@ let liveRequestId=0,liveSearchTimer=null;
 function setSourceNote(text,stateName=""){
   const note=$("#sourceNote");if(!note)return;note.textContent=text;note.className="live-note"+(stateName?" "+stateName:"");
 }
+let staticFeedLoaded=false,staticFeedLoading=null;
+async function loadStaticFeed({quiet=false}={}){
+  /* GitHub Pages edition: events.json is refreshed daily by the repo's GitHub Action
+     (update-events.mjs + the TM_API_KEY secret). Same shape as the embedded set. */
+  if(staticFeedLoaded) return;
+  if(staticFeedLoading) return staticFeedLoading;
+  if(location.protocol==="file:"){setSourceNote("verified regional collection","live");staticFeedLoaded=true;return}
+  if(!quiet)setSourceNote("loading today's events…","loading");
+  staticFeedLoading=fetch("events.json",{cache:"no-store"})
+    .then(r=>r.ok?r.json():Promise.reject(new Error("HTTP "+r.status)))
+    .then(list=>{
+      if(!Array.isArray(list)||!list.length) throw new Error("empty feed");
+      EVENTS.length=0;
+      list.forEach((ev,i)=>EVENTS.push({...ev,_id:ev._id||slug(ev.t),sv:ev.sv??5+(i*7)%23+(ev.free?4:0)}));
+      setSourceNote(`${list.length} events · refreshed daily`,"live");
+      render();
+    })
+    .catch(()=>{setSourceNote("verified regional collection","live")})
+    .finally(()=>{staticFeedLoaded=true;staticFeedLoading=null});
+  return staticFeedLoading;
+}
 async function loadNearbyEvents({quiet=false}={}){
-  /* GitHub Pages is a static host, so this edition uses its embedded verified collection. */
-  if(STATIC_GITHUB_EDITION){setSourceNote("verified regional collection","live");return}
+  if(STATIC_GITHUB_EDITION){return loadStaticFeed({quiet})}
   if(location.protocol==="file:"){setSourceNote("start the companion server");return}
   const requestId=++liveRequestId;
   if(!quiet)setSourceNote("searching live events…","loading");
@@ -1616,7 +1636,8 @@ function setPrimaryView(view){
   if(view==="map")setTimeout(()=>map.invalidateSize(),50);
 }
 $("#discoverBtn").addEventListener("click",()=>setPrimaryView("discover"));
-$("#mapBtn").addEventListener("click",()=>setPrimaryView("map"));
+$("#mapBtn").addEventListener("click",()=>
+);
 
 /* ============ collaborative plans ============ */
 const selectedPlan=new Set();
@@ -1680,7 +1701,7 @@ if(PERSISTED.light){
 if(PERSISTED.bannerDismissed){
   $("#appBanner").remove(); document.body.classList.remove("hasbanner");
 }
-syncQuickUI();setPrimaryView("discover");
+syncQuickUI();setPrimaryView("map");
 render();
 openFromHash();
 loadNearbyEvents({quiet:true});
